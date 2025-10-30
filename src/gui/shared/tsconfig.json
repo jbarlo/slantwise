@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    "composite": true,
+
+    /* Modules */
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "rootDir": ".",
+    "moduleResolution": "Bundler",
+    "types": [],
+    "resolveJsonModule": true,
+    "resolvePackageJsonExports": true,
+    "jsx": "react-jsx",
+    "moduleDetection": "force",
+
+    /* Declarations output for project references */
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "outDir": "../../../out/types/shared",
+
+    /* Interop Constraints */
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "erasableSyntaxOnly": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Completeness */
+    "skipLibCheck": true,
+
+    "baseUrl": ".",
+    "paths": {
+      // shadcn paths
+      "@shared/*": ["./*"],
+      "@core/*": ["../../core/*"],
+      "@lang-data/*": ["../../lang-data/*"],
+      "@config/*": ["../../config/*"]
+    }
+  },
+  "include": ["./**/*"],
+  "references": [
+    { "path": "../../core/tsconfig.json" },
+    { "path": "../../lang-data/tsconfig.json" },
+    { "path": "../../config/tsconfig.json" }
+  ]
+}
+

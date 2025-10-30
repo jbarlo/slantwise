@@ -1,0 +1,12 @@
+ignoredBuiltDependencies:
+  - better-sqlite3
+  - esbuild
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - better-sqlite3
+  - electron
+  - esbuild
+
+# required to support Electron's packaging toolchain when using pnpm
+nodeLinker: 'hoisted'

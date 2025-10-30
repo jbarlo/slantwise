@@ -1,0 +1,17 @@
+.direnv/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+files.db
+node_modules/
+dist/
+
+out
+out/types/
+.DS_Store
+.eslintcache
+*.log*
+*.tsbuildinfo
+.sqlite-watcher-file

@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "outDir": "../../out/types/core",
+    "baseUrl": "../..",
+    "paths": {
+      "@lang-data/*": ["src/lang-data/*"],
+      "@config/*": ["src/config/*"]
+    }
+  },
+  "include": ["./**/*"],
+  "references": [
+    { "path": "../lang-data/tsconfig.json" },
+    { "path": "../config/tsconfig.json" }
+  ]
+} 

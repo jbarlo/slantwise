@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+
+    /* Language and Environment */
+    "target": "es2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "preserve",
+
+    /* Modules */
+    "module": "ESNext",
+    "rootDir": ".",
+    "moduleResolution": "Bundler",
+    "types": [],
+    "resolveJsonModule": true,
+    "resolvePackageJsonExports": true,
+    "paths": {
+      "@lang-data/*": ["./src/lang-data/*"],
+      "@config/*": ["./src/config/*"]
+    },
+
+
+    /* JavaScript Support */
+    "allowJs": true,
+
+    /* Emit */
+    "outDir": "./dist",
+    "noEmit": true,
+
+    /* Interop Constraints */
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "erasableSyntaxOnly": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+
+    /* Completeness */
+    "skipLibCheck": true
+  }
+} 

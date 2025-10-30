@@ -1,0 +1,41 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "src/renderer/src/env.d.ts",
+    "src/renderer/src/**/*",
+    "src/renderer/src/**/*.tsx",
+    "src/preload/*.d.ts"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    // Align module resolution with shared/web to prevent duplicate type identities
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "resolvePackageJsonExports": true,
+    "paths": {
+      "@renderer/*": [
+        "src/renderer/src/*"
+      ],
+      "@shared/*": [
+        "../shared/*"
+      ],
+      "@core/*": [
+        "../../core/*"
+      ],
+      "@lang-data/*": [
+        "../../lang-data/*"
+      ],
+      "@config/*": [
+        "../../config/*"
+      ]
+    }
+  },
+  "references": [
+    { "path": "../shared/tsconfig.json" },
+    { "path": "../../core/tsconfig.json" },
+    { "path": "../../lang-data/tsconfig.json" },
+    { "path": "../../config/tsconfig.json" }
+  ]
+}

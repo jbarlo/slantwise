@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    // Overrides specific to shared src, if needed later
+  },
+  "include": ["core/**/*", "cli/**/*"],
+  "exclude": ["gui/**/*"]
+}
