@@ -71,6 +71,7 @@ export const DerivationEditor = ({
         value={expression}
         onChange={setExpression}
         placeholder="Enter formula"
+        autoFocus
       />
       <div className="flex justify-end gap-2">
         <Button onClick={handleExecute} disabled={isInexecutable}>

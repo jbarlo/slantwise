@@ -129,18 +129,44 @@ interface DerivationCodeMirrorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  autoFocus?: boolean;
 }
 
 export const DerivationCodeMirror = ({
   value,
   onChange,
   className,
-  placeholder
+  placeholder,
+  autoFocus
 }: DerivationCodeMirrorProps) => {
   const derivationsQuery = trpc.getAllDerivations.useQuery();
   const { resolvedTheme } = useTheme();
+  const focusLatchRef = useRef<EditorView | null>(null);
 
   const extensions = useManageExtensions(derivationsQuery.data ?? []);
+
+  // Capture editor view for focusing
+  const extensionsWithFocus = useMemo<Extension[]>(
+    () => [
+      ...extensions,
+      EditorView.updateListener.of((update) => {
+        // focus once on mount
+        if (update.view && !focusLatchRef.current) {
+          focusLatchRef.current = update.view;
+          // Focus immediately when editor view is created if autoFocus is enabled
+          if (autoFocus) {
+            const docLength = update.view.state.doc.length;
+            update.view.dispatch({
+              selection: { anchor: docLength },
+              scrollIntoView: true
+            });
+            update.view.focus();
+          }
+        }
+      })
+    ],
+    [extensions, autoFocus]
+  );
 
   return (
     <div
@@ -157,7 +183,7 @@ export const DerivationCodeMirror = ({
         className="flex-1"
         value={value}
         onChange={onChange}
-        extensions={extensions}
+        extensions={extensionsWithFocus}
         basicSetup={basicSetupConfig}
         placeholder={placeholder}
         theme={resolvedTheme}
