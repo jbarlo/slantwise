@@ -27,7 +27,8 @@ try {
           ipcRenderer.removeListener(THEME_CHANGED_IPC_EVENT, listener);
         };
       },
-      getWatcherStatus: () => ipcRenderer.invoke('get-watcher-status') as Promise<WatcherStatusUpdate>,
+      getWatcherStatus: () =>
+        ipcRenderer.invoke('get-watcher-status') as Promise<WatcherStatusUpdate>,
       onWatcherStatusChange: (callback: (status: WatcherStatusUpdate) => void) => {
         const listener = (_event: Electron.IpcRendererEvent, status: WatcherStatusUpdate) =>
           callback(status);
