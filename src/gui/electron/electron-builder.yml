@@ -1,5 +1,4 @@
-# TODO real DNS
-appId: com.slantwise.slantwise
+appId: dev.slantwise.slantwise
 productName: slantwise
 directories:
   buildResources: src/gui/electron/build
@@ -23,12 +22,8 @@ nsis:
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
-  # TODO confirm
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
@@ -38,7 +33,7 @@ linux:
     # - snap
     # - deb
   # TODO
-  # maintainer: James <james@slantwise.com>
+  # maintainer: James <james@slantwise.dev>
   category: Utility
   icon: icon.png
 appImage:
