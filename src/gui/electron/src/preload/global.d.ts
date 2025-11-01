@@ -4,7 +4,6 @@ declare global {
       invokeTrpc: (path: string, input: unknown) => Promise<unknown>;
       system: {
         onThemeChange: (callback: (isDark: boolean) => void) => () => void;
-        setThemeSource: (source: 'system' | 'light' | 'dark') => Promise<boolean>;
       };
     };
   }
