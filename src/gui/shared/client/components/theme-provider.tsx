@@ -12,7 +12,7 @@ type ThemeProviderState = {
 const initialState: ThemeProviderState = {
   theme: 'system',
   setTheme: () => null,
-  resolvedTheme: 'light'
+  resolvedTheme: 'dark'
 };
 
 export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
