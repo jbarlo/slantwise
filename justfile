@@ -15,11 +15,11 @@ _electron-vite command:
 
 # Run dev build
 [group('Development')]
-dev: install (_prep-dependencies "electron") (_electron-vite "dev")
+dev: (_prep-dependencies "electron") (_electron-vite "dev")
 
 # Run preview production build
 [group('Development')]
-preview: install (_prep-dependencies "electron") (_electron-vite "preview")
+preview: (_prep-dependencies "electron") (_electron-vite "preview")
 
 ### Tests
 
