@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { ThemeProviderContext } from '../components/theme-provider';
 import { trpc } from '../utils';
 
@@ -23,14 +23,15 @@ export function useTheme() {
     }
   });
 
-  const { setTheme: contextSetTheme, theme } = context;
+  const { setTheme: contextSetTheme } = context;
 
+  const contextInitializedLatchRef = useRef(false);
   useEffect(() => {
-    // overwrite local theme with backend on initialization
-    if (themeQuery.data && themeQuery.data !== theme) {
+    if (themeQuery.data && !contextInitializedLatchRef.current) {
+      contextInitializedLatchRef.current = true;
       contextSetTheme(themeQuery.data);
     }
-  }, [themeQuery.data, theme, contextSetTheme]);
+  }, [themeQuery.data, contextSetTheme]);
 
   const setTheme = (theme: typeof context.theme) => {
     context.setTheme(theme);
