@@ -9,6 +9,7 @@ import { DerivationsSidebar } from './components/DerivationsSidebar';
 import { DerivationEditor } from './components/DerivationEditor';
 import { ThemeProvider } from './components/theme-provider';
 import { ModeToggle } from './components/mode-toggle';
+import { WatcherStatusBar } from './components/WatcherStatusBar';
 import { trpc } from './utils';
 
 const AppContent = () => {
@@ -46,7 +47,7 @@ const AppContent = () => {
         selectedDerivationId={selectedDerivationId}
         onDerivationSelect={handleDerivationSelect}
       />
-      <SidebarInset>
+      <SidebarInset className="flex flex-col">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="flex-1 text-lg font-semibold">
@@ -54,13 +55,16 @@ const AppContent = () => {
           </div>
           <ModeToggle />
         </header>
-        <DerivationEditor
-          key={selectedDerivationId}
-          selectedDerivationId={selectedDerivationId}
-          initialExpression={initialExpression}
-          onDerivationCreated={handleDerivationCreated}
-          onDerivationUpdated={handleDerivationUpdated}
-        />
+        <div className="flex-1 overflow-auto">
+          <DerivationEditor
+            key={selectedDerivationId}
+            selectedDerivationId={selectedDerivationId}
+            initialExpression={initialExpression}
+            onDerivationCreated={handleDerivationCreated}
+            onDerivationUpdated={handleDerivationUpdated}
+          />
+        </div>
+        <WatcherStatusBar />
       </SidebarInset>
     </SidebarProvider>
   );

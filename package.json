@@ -4,7 +4,6 @@
   "description": "",
   "main": "./out/main/index.js",
   "scripts": {
-    "watch": "tsx src/core/main.ts",
     "cli": "tsx src/cli/cli-entry.tsx",
     "lint": "eslint --cache .",
     "format": "prettier --write .",
