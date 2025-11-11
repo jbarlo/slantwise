@@ -76,6 +76,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dmg-license": "^1.0.11",
     "electron": "37.2.6",
     "electron-builder": "^25.1.8",
     "electron-vite": "^4.0.0",
