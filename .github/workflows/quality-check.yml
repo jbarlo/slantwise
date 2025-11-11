@@ -12,37 +12,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      
+
       - name: Install Nix
         uses: cachix/install-nix-action@v26
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Cache Nix store
         uses: DeterminateSystems/magic-nix-cache-action@v7
-      
+
       - name: Install dependencies
-        run: nix develop --command just install
-      
+        run: nix develop .#ci-test --command just install
+
       - name: Run tests
-        run: nix develop --command just ci-test
+        run: nix develop .#ci-test --command just ci-test
 
   lint:
     name: Run typecheck and linter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      
+
       - name: Install Nix
         uses: cachix/install-nix-action@v26
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Cache Nix store
         uses: DeterminateSystems/magic-nix-cache-action@v7
-      
+
       - name: Install dependencies
-        run: nix develop --command just install
-      
+        run: nix develop .#ci-lint --command just install
+
       - name: Typecheck and lint
-        run: nix develop --command just ci-quality
+        run: nix develop .#ci-lint --command just ci-quality
