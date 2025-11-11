@@ -50,6 +50,18 @@
         ] ++ linuxElectronLibs;
         # macOS-specific packages
         darwinPackages = with pkgs; [];
+        ciLintPackages = with pkgs; [
+          nodejs_22
+          pnpm
+          just
+        ];
+        ciTestPackages = with pkgs; [
+          gcc
+          gnumake
+          sqlite # For the `sqlite3` CLI tool
+          # For electron-builder
+          python311 # specifically 3.11 or node-gyp will fail on lack of distutils
+        ] ++ ciLintPackages;
       in {
         # Development environment
         devShells.default = pkgs.mkShell {
@@ -78,6 +90,22 @@
             export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath linuxElectronLibs}:$LD_LIBRARY_PATH"
           '';
           ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_37}/bin/";
+        };
+
+        # Lightweight shell for CI linting/typechecking
+        devShells.ci-lint = pkgs.mkShell {
+          packages = ciLintPackages;
+          shellHook = ''
+            export PATH="$PWD/node_modules/.bin:$PATH"
+          '';
+        };
+
+        # Shell for CI tests
+        devShells.ci-test = pkgs.mkShell {
+          packages = ciTestPackages;
+          shellHook = ''
+            export PATH="$PWD/node_modules/.bin:$PATH"
+          '';
         };
 
         # --- Nix Apps for Operations (Optional) ---
