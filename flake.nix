@@ -15,6 +15,41 @@
           # electron deps
           electron_37
         ];
+        # Linux-specific Electron runtime dependencies
+        # TODO confirm what is necessary
+        linuxElectronLibs = with pkgs; [
+          glib # libglib-2.0.so.0
+          gtk3
+          nss
+          nspr
+          xorg.libX11
+          xorg.libXext
+          xorg.libXrandr
+          xorg.libXdamage
+          xorg.libXfixes
+          xorg.libXcomposite
+          xorg.libXrender
+          xorg.libXcursor
+          xorg.libxkbfile
+          xorg.libxcb
+          libxkbcommon
+          alsa-lib
+          atk
+          pango
+          libdrm
+          libgbm
+          dbus
+          cups
+          cairo
+          expat
+          libGL
+        ];
+        # Linux-only packages
+        linuxPackages = with pkgs; [
+          wine # For cross-platform Windows builds
+        ] ++ linuxElectronLibs;
+        # macOS-specific packages
+        darwinPackages = with pkgs; [];
       in {
         # Development environment
         devShells.default = pkgs.mkShell {
@@ -32,71 +67,15 @@
               pv
               # For electron-builder
               python311 # specifically 3.11 or node-gyp will fail on lack of distutils
+            ] ++ buildTools
+              ++ pkgs.lib.optionals pkgs.stdenv.isLinux linuxPackages
+              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin darwinPackages;
 
-              # Electron runtime deps
-              # TODO confirm what is necessary
-              glib # libglib-2.0.so.0
-              gtk3
-              nss
-              pkgs.nspr
-              xorg.libX11
-              xorg.libXext
-              xorg.libXrandr
-              xorg.libXdamage
-              xorg.libXfixes
-              xorg.libXcomposite
-              xorg.libXrender
-              xorg.libXcursor
-              xorg.libxkbfile
-              xorg.libxcb
-              libxkbcommon
-              alsa-lib
-              atk
-              pango
-              libdrm
-              libgbm
-              dbus
-              pkgs.cups
-              pkgs.cairo
-              pkgs.expat
-              pkgs.libGL
-            ] ++ buildTools; # Add build tools to the shell environment
-
-          # Optional: Set environment variables or run commands on shell entry
           shellHook = ''
             export PATH="$PWD/node_modules/.bin:$PATH"
-            # Make Electron runtime libraries visible to the dynamic linker
-            export LD_LIBRARY_PATH="${
-              pkgs.lib.makeLibraryPath [
-                # Electron runtime deps
-                # TODO confirm what is necessary
-                pkgs.glib
-                pkgs.gtk3
-                pkgs.nss
-                pkgs.libxkbcommon
-                pkgs.alsa-lib
-                pkgs.atk
-                pkgs.pango
-                pkgs.libdrm
-                pkgs.libgbm
-                pkgs.xorg.libX11
-                pkgs.xorg.libXext
-                pkgs.xorg.libXrandr
-                pkgs.xorg.libXdamage
-                pkgs.xorg.libXfixes
-                pkgs.xorg.libXcomposite
-                pkgs.xorg.libXrender
-                pkgs.xorg.libXcursor
-                pkgs.xorg.libxkbfile
-                pkgs.xorg.libxcb
-                pkgs.nspr
-                pkgs.dbus
-                pkgs.cups
-                pkgs.cairo
-                pkgs.expat
-                pkgs.libGL
-              ]
-            }:$LD_LIBRARY_PATH"
+          '' + pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+            # Make Electron runtime libraries visible to the dynamic linker (Linux only)
+            export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath linuxElectronLibs}:$LD_LIBRARY_PATH"
           '';
           ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_37}/bin/";
         };
