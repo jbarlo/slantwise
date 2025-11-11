@@ -65,7 +65,7 @@ _prebuild:
   pnpm exec electron-vite --config src/gui/electron/electron.vite.config.ts build
 
 _electron-build params:
-  pnpm exec electron-builder --config src/gui/electron/electron-builder.yml {{params}}
+  pnpm exec electron-builder --config src/gui/electron/electron-builder.yml --publish never {{params}}
 
 # Build for targeted platforms (win, mac, linux, default: all)
 [group('Building')]
