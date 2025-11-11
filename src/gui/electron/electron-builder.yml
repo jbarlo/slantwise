@@ -38,7 +38,6 @@ linux:
   icon: icon.png
 appImage:
   artifactName: ${name}-${version}.${ext}
-# publish:
-#   provider: generic
-#   # TODO
-#   url: https://example.com/auto-updates
+publish:
+  provider: github
+  releaseType: release
