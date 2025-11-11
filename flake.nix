@@ -64,12 +64,6 @@
 
           # Optional: Set environment variables or run commands on shell entry
           shellHook = ''
-            echo "Entering slantwise development environment..."
-            # Automatically install node deps if node_modules doesn't exist
-            if [ ! -d "node_modules" ]; then
-              echo "Running pnpm install..."
-              pnpm install --frozen-lockfile
-            fi
             export PATH="$PWD/node_modules/.bin:$PATH"
             # Make Electron runtime libraries visible to the dynamic linker
             export LD_LIBRARY_PATH="${
