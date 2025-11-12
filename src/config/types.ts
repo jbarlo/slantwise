@@ -7,7 +7,7 @@ export type Theme = z.infer<typeof themeSchema>;
 export const configSchema = z.object({
   openaiApiKey: z.string().default(''),
   databasePath: z.string().min(1, 'Database path cannot be empty.'),
-  watchedDirectory: z.string().min(1, 'Watched directory path cannot be empty.'),
+  watchedDirectory: z.string().optional(),
   embeddingRpmLimit: z.number().positive().int().default(80),
   skipEmbedding: z.boolean().default(true),
   debug: z.boolean().default(false),
@@ -19,7 +19,7 @@ export type ConfigType = z.infer<typeof configSchema>;
 export const getDefaultConfig = (defaultDbPath: string): ConfigType => ({
   openaiApiKey: '',
   databasePath: defaultDbPath,
-  watchedDirectory: configSchema.shape.watchedDirectory.parse(undefined),
+  watchedDirectory: undefined,
   embeddingRpmLimit: configSchema.shape.embeddingRpmLimit.parse(undefined),
   skipEmbedding: configSchema.shape.skipEmbedding.parse(undefined),
   debug: configSchema.shape.debug.parse(undefined),

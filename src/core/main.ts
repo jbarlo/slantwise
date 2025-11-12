@@ -186,20 +186,26 @@ async function main() {
 
   try {
     components = await initializeApp();
-    const watchedDirectory = path.resolve(components.config.watchedDirectory);
-    await performInitialScan(
-      watchedDirectory,
-      components.appDal,
-      components.rateLimiter,
-      components.config
-    );
-    watcherSubscription = await startFileWatcher(
-      watchedDirectory,
-      components.appDal,
-      components.rateLimiter,
-      components.config
-    );
-    await new Promise(() => {}); // Keep running
+
+    if (components.config.watchedDirectory) {
+      const watchedDirectory = path.resolve(components.config.watchedDirectory);
+      await performInitialScan(
+        watchedDirectory,
+        components.appDal,
+        components.rateLimiter,
+        components.config
+      );
+      watcherSubscription = await startFileWatcher(
+        watchedDirectory,
+        components.appDal,
+        components.rateLimiter,
+        components.config
+      );
+      await new Promise(() => {}); // Keep running
+    } else {
+      console.log('No watched directory configured. Running without file scanning/watching.');
+      await new Promise(() => {}); // Keep running
+    }
   } catch (error) {
     logMainSetupError(error);
     process.exitCode = 1;
