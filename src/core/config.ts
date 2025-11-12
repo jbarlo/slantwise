@@ -17,7 +17,7 @@ import { configSchema, ConfigType, getDefaultConfig } from '@config/types.js';
 
 const paths = envPaths('slantwise', { suffix: '' });
 const configFilePath = path.join(paths.config, 'config.json');
-const defaultDbPath = path.join(paths.data, 'files.db');
+const defaultDbPath = path.join(paths.config, 'files.db');
 
 let loadedConfig: ConfigType | null = null;
 let openai: ReturnType<typeof createOpenAI> | null = null;
@@ -72,7 +72,7 @@ export async function getConfig(): Promise<ConfigType> {
 
   logConfigSummary(
     loadedConfig.databasePath,
-    loadedConfig.watchedDirectory,
+    loadedConfig.watchedDirectory ?? '(not configured)',
     `Raw: ${loadedConfig.embeddingRpmLimit}, Applied (80%): ${embeddingRpmLimit.toFixed(0)}`
   );
 
