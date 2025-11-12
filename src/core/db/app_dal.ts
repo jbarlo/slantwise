@@ -13,10 +13,9 @@ import {
   logDalSchemaApplyError
 } from '../logger.js';
 import { DependencyTree, OperationWarning, StepParams } from './types.js';
-
-// Paths to schema files (Derivations schema path added for future use)
-const coreSchemaPath = path.resolve('src/core/db/schema.sql');
-const derivationsSchemaPath = path.resolve('src/core/db/derivations_schema.sql');
+// Import SQL schemas as raw strings
+import coreSchemaContent from './schema.sql?raw';
+import derivationsSchemaContent from './derivations_schema.sql?raw';
 
 // --- Database Initialization (Handles Multiple Schemas) ---
 async function createDatabase(dbPath: string): Promise<Database.Database> {
@@ -45,17 +44,19 @@ async function createDatabase(dbPath: string): Promise<Database.Database> {
 
 async function initializeDatabase(db: Database.Database): Promise<Database.Database> {
   // Apply schemas sequentially
-  const schemasToApply = [coreSchemaPath, derivationsSchemaPath]; // Add derivations schema
+  const schemas = [
+    { name: 'core schema', content: coreSchemaContent },
+    { name: 'derivations schema', content: derivationsSchemaContent }
+  ];
 
   try {
-    for (const schemaPath of schemasToApply) {
-      logDalSchemaApplyStart(schemaPath);
-      const schema = await fs.readFile(schemaPath, 'utf-8');
-      db.exec(schema);
+    for (const schema of schemas) {
+      logDalSchemaApplyStart(schema.name);
+      db.exec(schema.content);
       logDalSchemaApplySuccess();
     }
   } catch (error: unknown) {
-    logDalSchemaApplyError((error as { schemaPath?: string })?.schemaPath ?? 'Unknown Schema', error);
+    logDalSchemaApplyError('Unknown Schema', error);
     db.close();
     throw error;
   }
