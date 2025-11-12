@@ -99,3 +99,6 @@ getUrlContent("https://news.ycombinator.com/")
 
 To see other frequently useful development commands, run `just`.
 
+## License
+
+Apache 2.0
