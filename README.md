@@ -1,4 +1,4 @@
-# Slantwise
+# ↗️ Slantwise
 
 A local app to iterate on LLM chains with declarative and reactive formulas. Test your prompt variants quickly and as-needed with a deduplicated cache and lazy evaluation.
 
@@ -99,3 +99,6 @@ getUrlContent("https://news.ycombinator.com/")
 
 To see other frequently useful development commands, run `just`.
 
+## License
+
+Apache 2.0
