@@ -42,16 +42,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v27
+      - uses: extractions/setup-just@v2
+
+      - uses: pnpm/action-setup@v4
         with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: nix develop --command just install
+        run: just install
 
       - name: Build Windows
-        run: nix develop --command just build win
+        run: just build win
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
