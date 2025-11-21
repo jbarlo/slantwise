@@ -60,8 +60,8 @@ const keywordArgs: Record<string, Completion[]> = {
       type: 'property',
       detail: 'LlmModel',
       info: 'The LLM model to use',
-      // FIXME pick first available model
-      apply: 'model="gpt-4o"'
+      // FIXME pick first alias dynamically
+      apply: 'model="openai/gpt-5"'
     }
   ]
 };

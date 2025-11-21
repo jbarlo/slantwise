@@ -19,7 +19,9 @@ It's still early, but if you want to prototype workflows with formulas, this is 
    - on Linux, found in `~/.config/slantwise`
    - on MacOS, found in `~/Library/Preferences/slantwise`
    - on Windows, found in `%APPDATA%\slantwise\Config`
-3. update `openaiApiKey` to your OpenAI API key, and save
+3. update at least one API key:
+   - `openaiApiKey` - for OpenAI models
+   - `openRouterApiKey` - for OpenRouter models
 
 ## Usage
 
@@ -32,46 +34,46 @@ At the moment, the available operations are:
 `llm` behaves like a single conversation turn:
 
 ```
-llm("hot air balloon", prompt="write me a bedtime story about the topic", model="gpt-4o")
+llm("hot air balloon", prompt="write me a bedtime story about the topic", model="openai/gpt-5")
 ```
 
 Formulas are nestable:
 
 ```
 llm(
-  llm("hot air balloon", prompt="write me a bedtime story about the topic", model="gpt-4o"),
+  llm("hot air balloon", prompt="write me a bedtime story about the topic", model="openai/gpt-5"),
   prompt="rate this bedtime story. 5 star scale",
-  model="gpt-4o-mini"
+  model="openai/gpt-5"
 )
 ```
 
 or chained using pipe operators (this is the same as the above):
 
 ```
-llm("hot air balloon", prompt="write me a bedtime story about the topic", model="gpt-4o")
-|> llm(prompt="write a review for this story",  model="gpt-4o-mini")
+llm("hot air balloon", prompt="write me a bedtime story about the topic", model="openai/gpt-5")
+|> llm(prompt="write a review for this story",  model="openai/gpt-5")
 ```
 
 and chains can get arbitrarily long:
 
 ```
-llm("hot air balloon", prompt="write me a bedtime story about the topic", model="gpt-4o")
-|> llm(prompt="write a review for this story", model="gpt-4o-mini")
-|> llm(prompt="give an appropriate 5-point rating that matches this review", model="gpt-4o-mini")
+llm("hot air balloon", prompt="write me a bedtime story about the topic", model="openai/gpt-5")
+|> llm(prompt="write a review for this story", model="openai/gpt-5")
+|> llm(prompt="give an appropriate 5-point rating that matches this review", model="openai/gpt-o3")
 ```
 
 `getUrlContent` uses [Jina Reader](https://jina.ai/reader/) to retrieve web content for the given URL in an LLM-friendly format. It's chainable with `llm` for some interesting results:
 
 ```
 getUrlContent("https://news.ycombinator.com/")
-|> llm(prompt="list the links to hardware-related threads", model="gpt-4o")
+|> llm(prompt="list the links to hardware-related threads", model="openai/gpt-5")
 ```
 
 ## On the docket (in no particular order)
 
 - file path referencing
 - bulk processing
-- multi-model support
+- more model support
 - rate-limit aware queueing
 - reforming the development cli to a blessed-path cli
 - multi-workspace with live file watching

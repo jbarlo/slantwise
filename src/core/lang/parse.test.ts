@@ -4,7 +4,7 @@ import { parseDerivationExpression, __parseDerivationExpressionAst } from './ind
 describe('parseDerivationExpression', () => {
   it('parses llm with constant positional input and keyword args', () => {
     const result = parseDerivationExpression(
-      'llm("hello", prompt="Summarize", model="gpt-4o")'
+      'llm("hello", prompt="Summarize", model="openai/gpt-o3")'
     );
     expect(result.success).toBe(true);
     assert(result.success);
@@ -13,7 +13,7 @@ describe('parseDerivationExpression', () => {
       operation: 'llm',
       inputs: [{ type: 'constant', value: 'hello' }],
       prompt: 'Summarize',
-      model: 'gpt-4o'
+      model: 'openai/gpt-o3'
     });
   });
 
@@ -43,7 +43,7 @@ describe('parseDerivationExpression', () => {
 
   it('parses nested computed step as positional input', () => {
     const result = parseDerivationExpression(
-      'llm(identity("hello"), prompt="rewrite", model="gpt-4o-mini")'
+      'llm(identity("hello"), prompt="rewrite", model="openai/gpt-5")'
     );
     expect(result.success).toBe(true);
     assert(result.success);
@@ -60,7 +60,7 @@ describe('parseDerivationExpression', () => {
         }
       ],
       prompt: 'rewrite',
-      model: 'gpt-4o-mini'
+      model: 'openai/gpt-5'
     });
   });
 
@@ -81,7 +81,7 @@ describe('parseDerivationExpression', () => {
 
   it('supports the pipe operator and injects LHS as first input of RHS', () => {
     const result = parseDerivationExpression(
-      'identity("a") |> llm(prompt="b", model="gpt-4o")'
+      'identity("a") |> llm(prompt="b", model="openai/gpt-o3")'
     );
     expect(result.success).toBe(true);
     assert(result.success);
@@ -97,7 +97,7 @@ describe('parseDerivationExpression', () => {
         }
       ],
       prompt: 'b',
-      model: 'gpt-4o'
+      model: 'openai/gpt-o3'
     });
   });
 
@@ -115,7 +115,7 @@ describe('parseDerivationExpression', () => {
   });
 
   it('parser-only: allows kwargs when no positional args in RHS list', () => {
-    const parsed = __parseDerivationExpressionAst('llm(prompt="p", model="gpt-4o")');
+    const parsed = __parseDerivationExpressionAst('llm(prompt="p", model="openai/gpt-o3")');
     expect(parsed.success).toBe(true);
   });
 
@@ -144,7 +144,7 @@ describe('parseDerivationExpression', () => {
   it('parses derivation reference in pipeline', () => {
     const expectedId = 'source-doc';
     const result = parseDerivationExpression(
-      `$${expectedId} |> llm(prompt="Summarize", model="gpt-4o")`
+      `$${expectedId} |> llm(prompt="Summarize", model="openai/gpt-o3")`
     );
     assert(result.success);
     const params = result.params;
@@ -152,7 +152,7 @@ describe('parseDerivationExpression', () => {
       operation: 'llm',
       inputs: [{ type: 'derivation', id: expectedId }],
       prompt: 'Summarize',
-      model: 'gpt-4o'
+      model: 'openai/gpt-o3'
     });
   });
 
@@ -183,10 +183,10 @@ describe('parseDerivationExpression', () => {
     });
 
     it('enforces kwargs must follow positional inputs', () => {
-      const ok = parseDerivationExpression('llm("x", prompt="p", model="gpt-4o")');
+      const ok = parseDerivationExpression('llm("x", prompt="p", model="openai/gpt-o3")');
       expect(ok.success).toBe(true);
 
-      const bad = parseDerivationExpression('llm(prompt="p", "x", model="gpt-4o")');
+      const bad = parseDerivationExpression('llm(prompt="p", "x", model="openai/gpt-o3")');
       expect(bad.success).toBe(false);
       assert(!bad.success);
       expect(bad.kind).toBe('ast-transform');

@@ -2,9 +2,9 @@ export const operations = [
   {
     name: 'llm',
     detail: 'Apply LLM transformation',
-    info: 'llm(input, prompt="...", model="gpt-4o")\n\nApplies a large language model to transform the input using the specified prompt.',
-    snippet: 'llm(${1:input}, prompt="${2:your prompt}", model="${3:gpt-4o}")${4}',
-    snippetAfterPipe: 'llm(prompt="${1:your prompt}", model="${2:gpt-4o}")${3}'
+    info: 'llm(input, prompt="...", model="openai/gpt-5")\n\nApplies a large language model to transform the input using the specified prompt.',
+    snippet: 'llm(${1:input}, prompt="${2:your prompt}", model="${3:openai/gpt-5}")${4}',
+    snippetAfterPipe: 'llm(prompt="${1:your prompt}", model="${2:openai/gpt-5}")${3}'
   },
   {
     name: 'identity',
