@@ -44,6 +44,7 @@ describe('Derivation Engine', () => {
       limiter,
       {
         openaiApiKey: 'test',
+        openRouterApiKey: 'test',
         databasePath: 'test',
         watchedDirectory: 'test',
         embeddingRpmLimit: 1000,
@@ -1165,7 +1166,7 @@ describe('Derivation Engine', () => {
         label: 'test',
         recipeParams: {
           operation: 'llm',
-          model: 'gpt-4o-mini',
+          model: 'openai/gpt-5',
           prompt: 'test',
           inputs: [{ type: 'content', hash: inputHash }]
         }

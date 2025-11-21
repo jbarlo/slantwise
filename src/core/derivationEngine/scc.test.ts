@@ -44,6 +44,7 @@ describe('SCC Planning and Evaluation', () => {
       limiter,
       {
         openaiApiKey: 'test',
+        openRouterApiKey: 'test',
         databasePath: 'test',
         watchedDirectory: 'test',
         embeddingRpmLimit: 1000,

@@ -1,5 +1,6 @@
 import path from 'path';
 import { createOpenAI } from '@ai-sdk/openai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import envPaths from 'env-paths';
 import {
   logConfigLoadingAttempt,
@@ -21,6 +22,7 @@ export const defaultDbPath = path.join(paths.config, 'files.db');
 
 let loadedConfig: ConfigType | null = null;
 let openai: ReturnType<typeof createOpenAI> | null = null;
+let openrouter: ReturnType<typeof createOpenRouter> | null = null;
 let embeddingModel: ReturnType<ReturnType<typeof createOpenAI>['embedding']> | null = null;
 let embeddingRpmLimit: number;
 
@@ -108,6 +110,21 @@ export async function getOpenAI(config: ConfigType): Promise<ReturnType<typeof c
   }
   return openai;
 }
+
+export async function getOpenRouter(
+  config: ConfigType
+): Promise<ReturnType<typeof createOpenRouter>> {
+  if (!openrouter) {
+    if (isEmpty(config.openRouterApiKey.trim())) {
+      throw new Error(
+        'OpenRouter API Key is not configured. Please set your API key in the application settings.'
+      );
+    }
+    openrouter = createOpenRouter({ apiKey: config.openRouterApiKey });
+  }
+  return openrouter;
+}
+
 export async function getEmbeddingModel(
   config: ConfigType
 ): Promise<NonNullable<typeof embeddingModel>> {
