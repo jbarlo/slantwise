@@ -3,6 +3,7 @@
   "include": [],
   "references": [
     { "path": "./src/core/tsconfig.json" },
+    { "path": "./src/cli/tsconfig.json" },
     { "path": "./src/gui/electron/tsconfig.web.json" },
     { "path": "./src/gui/electron/tsconfig.node.json" },
     { "path": "./src/gui/shared/tsconfig.json" }

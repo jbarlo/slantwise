@@ -5,6 +5,7 @@ A local app to iterate on LLM chains with declarative and reactive formulas. Tes
 > Note: this is super alpha software and the database schema is pretty unstable. Early feedback is welcome but please be aware that there is no guarantee data is transferrable from one version to another.
 
 ### Why?
+
 I developed this project partially out of curiosity and partially because it's too slow to prototype LLM wrappers for simple ideas.
 A new LLM-friendly problem stares me in the face every other week; CLI agents are great, but sometimes I just want to lock in a flow I found useful.
 I found myself wanting the live iteration experience of reactive notebooks with the light syntax ergonomics of https://llm.datasette.io/, all while letting me figure out how the pieces fit together as I went.
@@ -13,13 +14,12 @@ It's still early, but if you want to prototype workflows with formulas, this is 
 
 ## Setup
 
-1. start Slantwise to generate config files
+1. run `slantwise init` to generate config files
 2. open `config.json`
-    - on Linux, found in `~/.config/slantwise`
-    - on MacOS, found in `~/Library/Preferences/slantwise`
-    - on Windows, found in `%APPDATA%\slantwise\Config`
+   - on Linux, found in `~/.config/slantwise`
+   - on MacOS, found in `~/Library/Preferences/slantwise`
+   - on Windows, found in `%APPDATA%\slantwise\Config`
 3. update `openaiApiKey` to your OpenAI API key, and save
-4. restart Slantwise
 
 ## Usage
 
@@ -87,7 +87,9 @@ getUrlContent("https://news.ycombinator.com/")
 1. Install Nix v2.31.0+ from the [Nix Download Page](https://nixos.org/download/)
 2. From the repo directory, run `nix develop`
 3. Install dependencies by running `just install`
-4. Run `just build {mac|win|linux}` to build for your specific OS, or `just build` to build for all platforms.
+4. Run the associated build command for the interface
+   - Electron App: Run `just build {mac|win|linux}` to build for your specific OS, or `just build` to build for all platforms.
+   - CLI: Run `just build-cli`
 
 ## Development
 
@@ -95,7 +97,9 @@ getUrlContent("https://news.ycombinator.com/")
 2. From the repo directory, run `nix develop` to enter the nix development environment  
    (Optionally: If you use direnv, run `direnv allow` once to automatically enter the environment when you navigate to the repo directory)
 3. Install dependencies by running `just install`
-4. Run `just dev` to start the Electron dev environment
+4. Run the development interface with the associated command:
+   - Electron App: Run `just dev` to start the Electron dev environment
+   - CLI: Run `just cli` to build and run the CLI
 
 To see other frequently useful development commands, run `just`.
 

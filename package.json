@@ -5,26 +5,35 @@
   "main": "./out/main/index.js",
   "scripts": {
     "watch": "tsx src/core/main.ts",
-    "cli": "tsx src/cli/cli-entry.tsx",
+    "build:cli": "vite build -c src/cli/vite.config.ts",
+    "cli": "pnpm build:cli && node out/cli.mjs",
     "lint": "eslint --cache .",
     "format": "prettier --write .",
     "test": "vitest",
     "build:types:config": "tsc -b src/config/tsconfig.json",
     "build:types:lang-data": "tsc -b src/lang-data/tsconfig.json",
     "build:types:core": "tsc -b src/core/tsconfig.json",
+    "build:types:cli": "tsc -b src/cli/tsconfig.json",
     "build:types:shared": "tsc -b src/gui/shared/tsconfig.json",
     "typecheck:config": "tsc --noEmit -p src/config/tsconfig.json",
     "typecheck:lang-data": "tsc --noEmit -p src/lang-data/tsconfig.json",
     "typecheck:core": "tsc --noEmit -p src/core/tsconfig.json",
+    "typecheck:cli": "tsc --noEmit -p src/cli/tsconfig.json",
     "typecheck:shared": "tsc --noEmit -p src/gui/shared/tsconfig.json",
     "typecheck:electron:web": "tsc --noEmit -p src/gui/electron/tsconfig.web.json",
     "typecheck:electron:node": "tsc --noEmit -p src/gui/electron/tsconfig.node.json",
-    "typecheck": "pnpm -s run build:types:config && pnpm -s run build:types:lang-data && pnpm -s run build:types:core && pnpm -s run build:types:shared && pnpm -s run typecheck:config && pnpm -s run typecheck:lang-data && pnpm -s run typecheck:core && pnpm -s run typecheck:shared && pnpm -s run typecheck:electron:web && pnpm -s run typecheck:electron:node",
+    "typecheck": "pnpm -s run build:types:config && pnpm -s run build:types:lang-data && pnpm -s run build:types:core && pnpm -s run build:types:cli && pnpm -s run build:types:shared && pnpm -s run typecheck:config && pnpm -s run typecheck:lang-data && pnpm -s run typecheck:core && pnpm -s run typecheck:cli && pnpm -s run typecheck:shared && pnpm -s run typecheck:electron:web && pnpm -s run typecheck:electron:node",
     "generate:syntax-diagram": "tsx src/lang/generate-syntax-diagram.ts output/chevrotain-diagram.html"
   },
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
+  "bin": {
+    "slantwise": "./out/cli.mjs"
+  },
+  "files": [
+    "out/cli.mjs"
+  ],
   "dependencies": {
     "@ai-sdk/openai": "^1.3.23",
     "@codemirror/autocomplete": "^6.19.0",

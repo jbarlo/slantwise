@@ -3,6 +3,6 @@
   "compilerOptions": {
     // Overrides specific to shared src, if needed later
   },
-  "include": ["core/**/*", "cli/**/*"],
+  "include": ["core/**/*"],
   "exclude": ["gui/**/*"]
 }

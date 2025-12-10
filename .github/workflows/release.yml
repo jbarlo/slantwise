@@ -84,6 +84,29 @@ jobs:
           name: macos-build
           path: dist/*.dmg
 
+  publish-npm:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: nix develop --command just install
+
+      - name: Publish CLI to npm
+        run: nix develop --command just publish-cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   release:
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
