@@ -17,6 +17,14 @@ _electron-vite command:
 [group('Development')]
 dev: (_prep-dependencies "electron") (_electron-vite "dev")
 
+# Run dev CLI
+[group('Development')]
+[positional-arguments]
+dev-cli *args:
+  pnpm cli $@
+
+alias cli := dev-cli
+
 # Run preview production build
 [group('Development')]
 preview: (_prep-dependencies "electron") (_electron-vite "preview")
@@ -59,6 +67,10 @@ ci-lint:
 format:
   pnpm run format
 
+[group('Linting')]
+cli-typecheck:
+  pnpm build:types:cli
+
 ### Building
 
 _prebuild:
@@ -79,6 +91,14 @@ build platform="all": typecheck (_prep-dependencies-electron) _prebuild
 [group('Building')]
 unpack: typecheck (_prep-dependencies-electron) _prebuild
   just _electron-build "--dir"
+
+[group('Building')]
+build-cli: cli-typecheck
+  pnpm build:cli
+
+[group('Building')]
+publish-cli: build-cli
+  pnpm publish --access public --no-git-checks
 
 ### Utils
 
