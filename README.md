@@ -8,7 +8,7 @@ A local app to iterate on LLM chains with declarative and reactive formulas. Tes
 
 I developed this project partially out of curiosity and partially because it's too slow to prototype LLM wrappers for simple ideas.
 A new LLM-friendly problem stares me in the face every other week; CLI agents are great, but sometimes I just want to lock in a flow I found useful.
-I found myself wanting the live iteration experience of reactive notebooks with the light syntax ergonomics of https://llm.datasette.io/, all while letting me figure out how the pieces fit together as I went.
+I found myself wanting the live iteration experience of reactive notebooks with the light syntax ergonomics of https://llm.datasette.io/, while letting me figure out how the pieces fit together as I went.
 Essentially, I wanted Excel but with more space to read.
 It's still early, but if you want to prototype workflows with formulas, this is for you!
 
@@ -87,19 +87,21 @@ getUrlContent("https://news.ycombinator.com/")
 ## Building from source
 
 1. Install Nix v2.31.0+ from the [Nix Download Page](https://nixos.org/download/)
-2. From the repo directory, run `nix develop`
-3. Install dependencies by running `just install`
-4. Run the associated build command for the interface
+2. Enable Nix flakes ([NixOS Wiki](https://nixos.wiki/wiki/Flakes))
+3. From the repo directory, run `nix develop`
+4. Install dependencies by running `just install`
+5. Run the associated build command for the interface
    - Electron App: Run `just build {mac|win|linux}` to build for your specific OS, or `just build` to build for all platforms.
    - CLI: Run `just build-cli`
 
 ## Development
 
 1. Install Nix v2.31.0+ from the [Nix Download Page](https://nixos.org/download/)
-2. From the repo directory, run `nix develop` to enter the nix development environment  
+2. Enable Nix flakes ([NixOS Wiki](https://nixos.wiki/wiki/Flakes))
+3. From the repo directory, run `nix develop` to enter the nix development environment  
    (Optionally: If you use direnv, run `direnv allow` once to automatically enter the environment when you navigate to the repo directory)
-3. Install dependencies by running `just install`
-4. Run the development interface with the associated command:
+4. Install dependencies by running `just install`
+5. Run the development interface with the associated command:
    - Electron App: Run `just dev` to start the Electron dev environment
    - CLI: Run `just cli` to build and run the CLI
 
