@@ -6,6 +6,7 @@ import { readCommand } from './commands/read.js';
 import { updateCommand } from './commands/update.js';
 import { deleteCommand } from './commands/delete.js';
 import { initCommand } from './commands/init.js';
+import { modelsCommand } from './commands/models.js';
 
 export type GlobalOptions = {
   interactive?: boolean;
@@ -36,6 +37,7 @@ program.addCommand(createCommand);
 program.addCommand(readCommand);
 program.addCommand(updateCommand);
 program.addCommand(deleteCommand);
+program.addCommand(modelsCommand);
 
 program.action(() => {
   program.help();

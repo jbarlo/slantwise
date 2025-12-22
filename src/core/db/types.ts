@@ -1,6 +1,5 @@
-import { map } from 'lodash-es';
 import { z } from 'zod/v4';
-import { llmModels } from '@lang-data/models.js';
+import { llmModels, getAlias } from '@lang-data/models.js';
 
 export const assertNever = (value: never): never => value;
 
@@ -41,7 +40,7 @@ const BaseDerivationParamsSchema = z.object({
   }
 });
 
-const modelAliases = map(llmModels, (l) => l.alias);
+const modelAliases = llmModels.map((m) => getAlias(m));
 const LlmModelSchema = z.enum(modelAliases);
 export type LlmModel = z.infer<typeof LlmModelSchema>;
 
