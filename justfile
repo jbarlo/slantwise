@@ -90,7 +90,7 @@ unpack: typecheck (_prep-dependencies-electron) _prebuild
 
 # Versions for native binary downloads
 better-sqlite3-version := "12.2.0"
-node-abi-version := "127"  # Node 22.x
+node-abi-version := "137"  # Node 24.x
 
 # Download prebuilt native binaries for CLI distribution
 [group('Building')]
