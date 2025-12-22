@@ -67,10 +67,6 @@ ci-lint:
 format:
   pnpm run format
 
-[group('Linting')]
-cli-typecheck:
-  pnpm build:types:cli
-
 ### Building
 
 _prebuild:
@@ -93,12 +89,151 @@ unpack: typecheck (_prep-dependencies-electron) _prebuild
   just _electron-build "--dir"
 
 [group('Building')]
-build-cli: cli-typecheck
+build-cli: typecheck
   pnpm build:cli
 
-[group('Building')]
+### CI
+
+[group('CI')]
 publish-cli: build-cli
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Guard: only allow in CI
+  if [ "$CI" != "true" ]; then
+    echo "❌ publish-cli should only run in CI"
+    echo "   Use the release workflow instead: just prepare-patch && just tag-release"
+    exit 1
+  fi
+
+  # Guard: ensure HEAD is tagged with current version
+  VERSION=$(jq -r '.version' package.json)
+  if ! git describe --exact-match --tags HEAD 2>/dev/null | grep -q "^v${VERSION}$"; then
+    echo "❌ HEAD is not tagged v${VERSION}"
+    echo "   Ensure the release workflow triggered correctly"
+    exit 1
+  fi
+
   pnpm publish --access public --no-git-checks
+
+### Release
+
+# Show current version and last git tag
+[group('Release')]
+version:
+  @echo "Current version: $(jq -r '.version' package.json)"
+  @echo "Last tag: $(git describe --tags --abbrev=0 2>/dev/null || echo 'none')"
+
+# Step 1: Prepare release PR with version bump
+[group('Release')]
+prepare-release type="patch": typecheck ci-test
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Ensure clean working directory
+  if [ -n "$(git status --porcelain)" ]; then
+    echo "❌ Error: Uncommitted changes detected"
+    echo "   Commit or stash changes before preparing release"
+    exit 1
+  fi
+
+  # Ensure on main branch
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  if [ "$BRANCH" != "main" ]; then
+    echo "❌ Error: Must be on main branch"
+    echo "   Currently on: $BRANCH"
+    exit 1
+  fi
+
+  # Ensure up to date with remote
+  git fetch origin
+  LOCAL=$(git rev-parse HEAD)
+  REMOTE=$(git rev-parse origin/main)
+  if [ "$LOCAL" != "$REMOTE" ]; then
+    echo "❌ Error: Local main is not in sync with origin/main"
+    echo "   Run: git pull"
+    exit 1
+  fi
+
+  # Bump version in package.json (no git operations)
+  echo "📦 Bumping {{type}} version..."
+  pnpm version {{type}} --no-git-tag-version
+  VERSION=$(jq -r '.version' package.json)
+
+  # Create release branch
+  BRANCH_NAME="release/v${VERSION}"
+  git checkout -b "$BRANCH_NAME"
+  git add package.json
+  git commit -m "chore: bump version to ${VERSION}"
+  git push -u origin "$BRANCH_NAME"
+
+  echo ""
+  echo "✅ Release branch created: $BRANCH_NAME"
+  echo "   Version: ${VERSION}"
+  echo ""
+  echo "📝 Next steps:"
+  echo "   1. Create PR: gh pr create --title \"Release v${VERSION}\" --body \"Release v${VERSION}\""
+  echo "   2. Merge PR via GitHub UI (squash or rebase)"
+  echo "   3. Run: git checkout main && git pull && just tag-release"
+
+# Step 2: Tag the release after PR is merged (run on main)
+[group('Release')]
+tag-release:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Ensure on main branch
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  if [ "$BRANCH" != "main" ]; then
+    echo "❌ Error: Must be on main branch"
+    echo "   Currently on: $BRANCH"
+    echo "   Run: git checkout main && git pull"
+    exit 1
+  fi
+
+  # Ensure up to date with remote
+  git fetch origin
+  LOCAL=$(git rev-parse HEAD)
+  REMOTE=$(git rev-parse origin/main)
+  if [ "$LOCAL" != "$REMOTE" ]; then
+    echo "❌ Error: Local main is not in sync with origin/main"
+    echo "   Run: git pull"
+    exit 1
+  fi
+
+  VERSION=$(jq -r '.version' package.json)
+  TAG_NAME="v${VERSION}"
+
+  # Check if tag already exists
+  if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+    echo "❌ Error: Tag $TAG_NAME already exists"
+    exit 1
+  fi
+
+  # Create annotated tag
+  echo "🏷️  Creating tag: $TAG_NAME"
+  git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+
+  # Push tag
+  echo "🚢 Pushing tag to origin..."
+  git push origin "$TAG_NAME"
+
+  echo ""
+  echo "✅ Successfully tagged and pushed $TAG_NAME"
+  echo "   Commit: $(git rev-parse --short HEAD)"
+  echo "   View builds: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')/actions"
+
+# Alias for prepare-relase "patch"
+[group('Release')]
+prepare-patch: (prepare-release "patch")
+
+# Alias for prepare-relase "minor"
+[group('Release')]
+prepare-minor: (prepare-release "minor")
+
+# Alias for prepare-relase "major"
+[group('Release')]
+prepare-major: (prepare-release "major")
 
 ### Utils
 
