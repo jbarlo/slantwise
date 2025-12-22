@@ -126,7 +126,8 @@ const _computeDependencies = async (
         const resolver: SccDerivationResolver = async (id, context) => {
           const res = await getOrComputeDerivedContent(appDal, id, limiter, config, {
             sccContext: context,
-            scc: undefined
+            scc: undefined,
+            skipCache: opts.skipCache
           });
           if (!res.success) return { success: false, error: res.error.message };
           return { success: true, executionTree: res.executionTree };
@@ -152,7 +153,7 @@ const _computeDependencies = async (
           currentInput.id,
           limiter,
           config,
-          { sccContext, scc: undefined }
+          { sccContext, scc: undefined, skipCache: opts.skipCache }
         );
 
         if (!derivationResult.success) {
@@ -264,6 +265,11 @@ const _tryShortCircuit = async (
   const { dependencyTree } = computedDependencies;
   const inputContentHashes = dependencyTree.map((input) => input.contentHash);
   const cacheKey = getDerivationCacheKey(recipeParams, inputContentHashes);
+
+  // force recompute if skipCache is set
+  if (opts.skipCache) {
+    return { shortCircuitAllowed: false, inputContentHashes, computedDependencies };
+  }
 
   // check if the step or an identical step is cached
   const stepCacheHit = await findEquivalentResult(appDal, cacheKey);
@@ -546,7 +552,8 @@ export async function getOrComputeDerivedContent(
       const resolver: SccDerivationResolver = async (id, context) => {
         const res = await getOrComputeDerivedContent(appDal, id, limiter, config, {
           sccContext: context,
-          scc: undefined
+          scc: undefined,
+          skipCache: opts?.skipCache
         });
         if (!res.success) return { success: false, error: res.error.message };
         return { success: true, executionTree: res.executionTree };
