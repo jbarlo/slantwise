@@ -1,2 +1,0 @@
-- pnpm.override."node-abi"
-  - to force update of @electron/rebuild to allow for Electron 37

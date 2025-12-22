@@ -11,7 +11,8 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
-  - node_modules/better-sqlite3/**
+  - node_modules/libsql/**
+  - node_modules/@libsql/**
   - node_modules/@parcel/watcher/**
 win:
   executableName: slantwise

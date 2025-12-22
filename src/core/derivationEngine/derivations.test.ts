@@ -1155,7 +1155,7 @@ describe('Derivation Engine', () => {
 
   describe('Input size limits', () => {
     it('should return a warning when inputs exceed context window limit', async () => {
-      const inputResult = range(CONTEXT_WINDOW_LIMIT_CHARS + 1)
+      const inputResult = range(1, CONTEXT_WINDOW_LIMIT_CHARS + 2)
         .map((i) => String.fromCharCode(i))
         .join('');
       const inputHash = hash(inputResult);

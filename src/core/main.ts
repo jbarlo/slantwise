@@ -1,5 +1,5 @@
 import path from 'path';
-import Database from 'better-sqlite3';
+import Database from 'libsql';
 import watcher from '@parcel/watcher';
 import { AppDal, createAppDal } from './db/app_dal.js';
 import { getConfig } from './config.js';

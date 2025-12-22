@@ -36,8 +36,7 @@
     "slantwise": "out/cli.mjs"
   },
   "files": [
-    "out/cli.mjs",
-    "out/vendor/**/*"
+    "out/cli.mjs"
   ],
   "dependencies": {
     "@ai-sdk/openai": "^2.0.72",
@@ -59,7 +58,7 @@
     "@trpc/server": "^11.7.1",
     "@uiw/react-codemirror": "^4.25.2",
     "ai": "^5.0.102",
-    "better-sqlite3": "^12.0.0",
+    "libsql": "^0.5.22",
     "chevrotain": "^11.0.3",
     "commander": "^14.0.0",
     "dotenv": "^16.5.0",
@@ -83,7 +82,6 @@
     "@tailwindcss/vite": "^4.1.12",
     "@tanstack/react-query": "^5.85.6",
     "@trpc/react-query": "^11.7.1",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.7",
@@ -116,13 +114,9 @@
   },
   "type": "module",
   "pnpm": {
-    "overrides": {
-      "node-abi": "^4.12.0"
-    },
     "onlyBuiltDependencies": [
       "@parcel/watcher",
       "@tailwindcss/oxide",
-      "better-sqlite3",
       "electron",
       "esbuild"
     ]

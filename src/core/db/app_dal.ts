@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import Database from 'better-sqlite3';
+import Database from 'libsql';
 import { ContentService } from './contentService.js';
 import { DerivationsService } from './derivationsService.js';
 // Import loggers for initialization
