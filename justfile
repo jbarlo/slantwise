@@ -88,8 +88,17 @@ build platform="all": typecheck (_prep-dependencies-electron) _prebuild
 unpack: typecheck (_prep-dependencies-electron) _prebuild
   just _electron-build "--dir"
 
+# Versions for native binary downloads
+better-sqlite3-version := "12.2.0"
+node-abi-version := "127"  # Node 22.x
+
+# Download prebuilt native binaries for CLI distribution
 [group('Building')]
-build-cli: typecheck
+download-cli-native-binaries:
+  ./scripts/download-sqlite-native-binaries.sh {{better-sqlite3-version}} {{node-abi-version}}
+
+[group('Building')]
+build-cli: typecheck download-cli-native-binaries
   pnpm build:cli
 
 ### CI
