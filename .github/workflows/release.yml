@@ -100,13 +100,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: nix develop --command just install
 
+      - name: Build CLI
+        run: nix develop --command just build-cli
+
       - name: Publish CLI to npm
-        run: nix develop --command just publish-cli
+        run: npm publish --access public
 
   release:
     needs: [build-linux, build-windows, build-macos]
