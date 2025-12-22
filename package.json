@@ -32,7 +32,8 @@
     "slantwise": "./out/cli.mjs"
   },
   "files": [
-    "out/cli.mjs"
+    "out/cli.mjs",
+    "out/vendor/**/*"
   ],
   "dependencies": {
     "@ai-sdk/openai": "^2.0.72",
