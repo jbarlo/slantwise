@@ -22,7 +22,10 @@ export default defineConfig({
         'libsql',
         ...builtinModules,
         ...builtinModules.map((m) => `node:${m}`)
-      ]
+      ],
+      output: {
+        banner: '#!/usr/bin/env node'
+      }
     }
   },
   resolve: {
