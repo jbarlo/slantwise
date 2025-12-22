@@ -101,30 +101,6 @@ download-cli-native-binaries:
 build-cli: typecheck download-cli-native-binaries
   pnpm build:cli
 
-### CI
-
-[group('CI')]
-publish-cli: build-cli
-  #!/usr/bin/env bash
-  set -euo pipefail
-
-  # Guard: only allow in CI
-  if [ "$CI" != "true" ]; then
-    echo "❌ publish-cli should only run in CI"
-    echo "   Use the release workflow instead: just prepare-patch && just tag-release"
-    exit 1
-  fi
-
-  # Guard: ensure HEAD is tagged with current version
-  VERSION=$(jq -r '.version' package.json)
-  if ! git describe --exact-match --tags HEAD 2>/dev/null | grep -q "^v${VERSION}$"; then
-    echo "❌ HEAD is not tagged v${VERSION}"
-    echo "   Ensure the release workflow triggered correctly"
-    exit 1
-  fi
-
-  pnpm publish --access public --no-git-checks
-
 ### Release
 
 # Show current version and last git tag
