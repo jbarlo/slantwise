@@ -14,5 +14,3 @@ out/types/
 .eslintcache
 *.log*
 *.tsbuildinfo
-.sqlite-watcher-file
-vendor/

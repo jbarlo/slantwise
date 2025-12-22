@@ -4,9 +4,8 @@ default:
 ### Development
 
 [group('Development')]
-install: && (_prep-dependencies "node")
+install:
   pnpm i --frozen-lockfile
-  @# after: trigger rebuild of better-sqlite3 to update the sqlite marker file
 
 alias i := install
 
@@ -15,7 +14,7 @@ _electron-vite command:
 
 # Run dev build
 [group('Development')]
-dev: (_prep-dependencies "electron") (_electron-vite "dev")
+dev: (_electron-vite "dev")
 
 # Run dev CLI
 [group('Development')]
@@ -27,12 +26,12 @@ alias cli := dev-cli
 
 # Run preview production build
 [group('Development')]
-preview: (_prep-dependencies "electron") (_electron-vite "preview")
+preview: (_electron-vite "preview")
 
 ### Tests
 
 [group('Tests')]
-test: (_prep-dependencies "node")
+test:
   pnpm test
 
 [group('Tests')]
@@ -77,7 +76,7 @@ _electron-build params:
 
 # Build for targeted platforms (win, mac, linux, default: all)
 [group('Building')]
-build platform="all": typecheck (_prep-dependencies-electron) _prebuild
+build platform="all": typecheck _prebuild
   {{ if platform == "all" {  "just _electron-build --win && just _electron-build --mac && just _electron-build --linux"  } \
   else if platform =='win' { "just _electron-build --win" } \
   else if platform =='mac' { "just _electron-build --mac" } \
@@ -85,20 +84,11 @@ build platform="all": typecheck (_prep-dependencies-electron) _prebuild
   else { error("Invalid platform: " + platform) } }}
 
 [group('Building')]
-unpack: typecheck (_prep-dependencies-electron) _prebuild
+unpack: typecheck _prebuild
   just _electron-build "--dir"
 
-# Versions for native binary downloads
-better-sqlite3-version := "12.2.0"
-node-abi-version := "137"  # Node 24.x
-
-# Download prebuilt native binaries for CLI distribution
 [group('Building')]
-download-cli-native-binaries:
-  ./scripts/download-sqlite-native-binaries.sh {{better-sqlite3-version}} {{node-abi-version}}
-
-[group('Building')]
-build-cli: typecheck download-cli-native-binaries
+build-cli: typecheck
   pnpm build:cli
 
 ### Release
@@ -225,36 +215,3 @@ prepare-major: (prepare-release "major")
 [group('Utils')]
 lang-diagram:
   pnpm generate:syntax-diagram
-
-
-### Internal Shared
-
-sqlite-watcher := '.sqlite-watcher-file'
-
-# Read the sqlite marker file
-_check-sqlite-state:
-  #!/usr/bin/env bash
-  if [ -f {{sqlite-watcher}} ]; then
-    cat {{sqlite-watcher}}
-  else
-    echo "unknown"
-  fi
-
-# Update the sqlite marker file
-_update-marker-file value:
-  @echo "{{value}}" > {{sqlite-watcher}}
-
-_prep-dependencies-electron: && (_update-marker-file "electron")
-  PREBUILD_INSTALL_DISABLE=1 \
-  npm_config_runtime=electron \
-  npm_config_target=$(node -p 'require("electron/package.json").version') \
-  npm_config_disturl=https://electronjs.org/headers \
-  pnpm exec electron-rebuild -f -v $(node -p 'require("electron/package.json").version')
-
-_prep-dependencies-node: && (_update-marker-file "node")
-  pnpm rebuild better-sqlite3
-
-_prep-dependencies expected:
-  @if [ "$(just _check-sqlite-state)" != {{ expected }} ]; then \
-    just {{ if expected == "electron" { "_prep-dependencies-electron" } else { "_prep-dependencies-node" } }}; \
-  fi
