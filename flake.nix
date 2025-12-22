@@ -51,7 +51,7 @@
         # macOS-specific packages
         darwinPackages = with pkgs; [];
         ciLintPackages = with pkgs; [
-          nodejs_22
+          nodejs_24
           pnpm
           just
         ];
@@ -67,7 +67,7 @@
         devShells.default = pkgs.mkShell {
           packages = with pkgs;
             [
-              nodejs_22
+              nodejs_24
               pnpm
               sqlite # For the `sqlite3` CLI tool
               # Add operation-specific tools here if they should be globally available

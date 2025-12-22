@@ -5,16 +5,16 @@ set -euo pipefail
 # These are bundled with the CLI for npm distribution
 #
 # Usage: ./scripts/download-native-binaries.sh <better-sqlite3-version> <node-abi-version>
-# Example: ./scripts/download-native-binaries.sh 12.5.0 127
+# Example: ./scripts/download-native-binaries.sh 12.5.0 137
 
 if [ $# -lt 2 ]; then
   echo "Usage: $0 <better-sqlite3-version> <node-abi-version>"
-  echo "Example: $0 12.5.0 127"
+  echo "Example: $0 12.5.0 137"
   exit 1
 fi
 
 BETTER_SQLITE3_VERSION="$1"
-NODE_ABI_VERSION="$2"  # e.g., 127 for Node 22.x
+NODE_ABI_VERSION="$2"  # e.g., 137 for Node 24.x
 
 VENDOR_DIR="vendor/better-sqlite3"
 BASE_URL="https://github.com/WiseLibs/better-sqlite3/releases/download/v${BETTER_SQLITE3_VERSION}"
