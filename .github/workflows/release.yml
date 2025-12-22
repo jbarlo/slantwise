@@ -88,6 +88,9 @@ jobs:
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -104,8 +107,6 @@ jobs:
 
       - name: Publish CLI to npm
         run: nix develop --command just publish-cli
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   release:
     needs: [build-linux, build-windows, build-macos]
