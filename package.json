@@ -28,8 +28,12 @@
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jbarlo/slantwise"
+  },
   "bin": {
-    "slantwise": "./out/cli.mjs"
+    "slantwise": "out/cli.mjs"
   },
   "files": [
     "out/cli.mjs",
