@@ -13,8 +13,8 @@ import {
   logConfigSummary
 } from './logger.js';
 import { readFileSafe, writeConfigFileAtomic } from './utils.js';
-import { isEmpty } from 'lodash-es';
 import { configSchema, ConfigType, getDefaultConfig } from '@config/types.js';
+import type { ModelProvider } from '@lang-data/models.js';
 
 const paths = envPaths('slantwise', { suffix: '' });
 export const configFilePath = path.join(paths.config, 'config.json');
@@ -99,9 +99,16 @@ export async function updateConfig(updates: Partial<ConfigType>): Promise<Config
   return loadedConfig;
 }
 
+export function hasApiKey(provider: ModelProvider, config: ConfigType): boolean {
+  if (provider === 'openai') {
+    return config.openaiApiKey.trim() !== '';
+  }
+  return config.openRouterApiKey.trim() !== '';
+}
+
 export async function getOpenAI(config: ConfigType): Promise<ReturnType<typeof createOpenAI>> {
   if (!openai) {
-    if (isEmpty(config.openaiApiKey.trim())) {
+    if (!hasApiKey('openai', config)) {
       throw new Error(
         'OpenAI API Key is not configured. Please set your API key in the application settings.'
       );
@@ -115,7 +122,7 @@ export async function getOpenRouter(
   config: ConfigType
 ): Promise<ReturnType<typeof createOpenRouter>> {
   if (!openrouter) {
-    if (isEmpty(config.openRouterApiKey.trim())) {
+    if (!hasApiKey('openrouter', config)) {
       throw new Error(
         'OpenRouter API Key is not configured. Please set your API key in the application settings.'
       );
