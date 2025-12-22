@@ -774,6 +774,45 @@ describe('Derivation Engine', () => {
       });
     });
 
+    it('should recompute when skipCache is true even if cached', async () => {
+      const expectedResult = 'test content';
+      const expectedHash = hash(expectedResult);
+
+      appDal.core.insertContentIfNew(expectedHash, expectedResult);
+
+      const derivationId = await createDerivation(appDal, {
+        label: 'test',
+        recipeParams: {
+          operation: 'identity',
+          inputs: [{ type: 'content', hash: expectedHash }]
+        }
+      });
+
+      // not cached
+      await expect(
+        getOrComputeDerivedContent(appDal, derivationId, limiter)
+      ).resolves.toMatchObject({
+        success: true,
+        executionTree: { wasCached: false }
+      });
+
+      // cached
+      await expect(
+        getOrComputeDerivedContent(appDal, derivationId, limiter)
+      ).resolves.toMatchObject({
+        success: true,
+        executionTree: { wasCached: true }
+      });
+
+      // reroll
+      await expect(
+        getOrComputeDerivedContent(appDal, derivationId, limiter, { skipCache: true })
+      ).resolves.toMatchObject({
+        success: true,
+        executionTree: { wasCached: false }
+      });
+    });
+
     it('should recompute when pinned path content changes', async () => {
       const absolutePath = '/test/path';
       const content = 'test content';
