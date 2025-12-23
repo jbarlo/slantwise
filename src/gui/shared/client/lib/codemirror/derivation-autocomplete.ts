@@ -5,7 +5,7 @@ import {
   Completion,
   snippet
 } from '@codemirror/autocomplete';
-import { llmModels } from '@lang-data/models.js';
+import { llmModels, getAlias } from '@lang-data/models.js';
 import { operations as operationConfigs, type OperationName } from '@lang-data/operations.js';
 import { derivationIdCharClass, derivationPrefix } from '@lang-data/tokens';
 import { map } from 'lodash-es';
@@ -39,10 +39,10 @@ const operationsAfterPipe: (Completion & { label: OperationName })[] = map(
 );
 
 const llmModelCompletions: Completion[] = llmModels.map((model) => ({
-  label: model.alias,
+  label: getAlias(model),
   detail: model.name,
   type: 'constant' as const,
-  apply: model.alias
+  apply: getAlias(model)
 }));
 
 const keywordArgs: Record<string, Completion[]> = {

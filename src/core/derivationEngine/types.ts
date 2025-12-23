@@ -61,6 +61,8 @@ export interface GetOrComputeDerivedContentByStepOpts {
   operationOptions?: Partial<OperationOptions>;
   // SCC execution context (internal use)
   sccContext?: SccExecutionContext;
+  // Skip cache lookup and force re-evaluation
+  skipCache?: boolean;
 }
 
 // TODO move? rename?
