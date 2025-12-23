@@ -1,6 +1,6 @@
 const readErrorKinds = {
   derivationNotFound: {
-    kind: 'derivation_not_found',
+    kind: 'formula_not_found',
     message: (ctx: { derivationId: string }) =>
       `#REF! Cell definition (ID: ${ctx.derivationId}) not found.`
   },
@@ -45,8 +45,7 @@ const readErrorKinds = {
   },
   derivationStoreFailure: {
     kind: 'derivation_store_failure',
-    message: (ctx: { error: string }) =>
-      `#STORE_FAIL! Failed to store cell result: ${ctx.error}`
+    message: (ctx: { error: string }) => `#STORE_FAIL! Failed to store cell result: ${ctx.error}`
   },
   dbError: {
     kind: 'db_error',

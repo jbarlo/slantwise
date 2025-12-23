@@ -698,7 +698,7 @@ describe('Derivation Engine', () => {
         getOrComputeDerivedContent(appDal, derivationId, limiter)
       ).resolves.toMatchObject({
         success: false,
-        error: { kind: 'derivation_not_found' }
+        error: { kind: 'formula_not_found' }
       });
     });
 
@@ -727,7 +727,7 @@ describe('Derivation Engine', () => {
         getOrComputeDerivedContent(appDal, derivationId, limiter)
       ).resolves.toMatchObject({
         success: false,
-        error: { kind: 'derivation_not_found' }
+        error: { kind: 'formula_not_found' }
       });
     });
   });
@@ -1186,7 +1186,7 @@ describe('Derivation Engine', () => {
       ).resolves.toMatchObject({
         success: false,
         error: {
-          kind: 'derivation_not_found'
+          kind: 'formula_not_found'
         }
       });
     });
