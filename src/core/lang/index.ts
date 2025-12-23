@@ -5,6 +5,9 @@ import {
   ExternalStepParamsSchema
 } from '../db/types.js';
 import { tokenPatterns } from '@lang-data/tokens.js';
+import { type ParseError, mapZodIssue } from './errors.js';
+
+export { type ParseError, type ParseErrorCode, formatParseError } from './errors.js';
 
 /*
  * ---------------------------------------------------------------------------
@@ -483,7 +486,7 @@ export type ParseDerivationResult =
   | {
       success: false;
       kind: 'lexer' | 'parser' | 'ast-validation' | 'ast-transform';
-      errors: string[];
+      errors: ParseError[];
     };
 
 export type ParseDerivationAstResult =
@@ -491,25 +494,22 @@ export type ParseDerivationAstResult =
   | {
       success: false;
       kind: 'lexer' | 'parser' | 'ast-transform';
-      errors: string[];
+      errors: ParseError[];
     };
 
 export function __parseDerivationExpressionAst(expression: string): ParseDerivationAstResult {
-  const errors: string[] = [];
-
   const { tokens, errors: lexErrors } = DerivationLexer.tokenize(expression);
   if (lexErrors.length) {
-    const lexMessages = lexErrors.map((e, idx) => {
-      const parts = [
-        `Lex #${idx + 1}: ${e.message}`,
+    const errors: ParseError[] = lexErrors.map((e) => {
+      const hasLineCol =
         typeof (e as { line?: number; column?: number }).line === 'number' &&
-        typeof (e as { line?: number; column?: number }).column === 'number'
-          ? `at line ${(e as { line: number; column: number }).line}, column ${(e as { line: number; column: number }).column}`
-          : `at offset ${e.offset}`
-      ];
-      return parts.join(' ');
+        typeof (e as { line?: number; column?: number }).column === 'number';
+      return {
+        code: 'SYNTAX_ERROR' as const,
+        message: e.message,
+        position: hasLineCol ? { line: e.line!, column: e.column! } : { offset: e.offset }
+      };
     });
-    errors.push(...lexMessages);
     return { success: false, kind: 'lexer', errors };
   }
 
@@ -517,16 +517,23 @@ export function __parseDerivationExpressionAst(expression: string): ParseDerivat
     parserInstance.input = tokens;
     const cst = parserInstance.expression();
     if (parserInstance.errors.length) {
-      const parseMessages = parserInstance.errors.map(
-        (e, idx) => `Parse #${idx + 1}: ${e.message}`
-      );
-      errors.push(...parseMessages);
+      const errors: ParseError[] = parserInstance.errors.map((e) => ({
+        code: 'SYNTAX_ERROR' as const,
+        message: e.message,
+        position:
+          e.token && e.token.startOffset !== undefined ? { offset: e.token.startOffset } : undefined
+      }));
       return { success: false, kind: 'parser', errors };
     }
     const ast = astBuilder.visit(cst);
     return { success: true, ast };
   } catch (err: unknown) {
-    errors.push(`AST transformation error: ${(err as Error)?.message ?? String(err)}`);
+    const errors: ParseError[] = [
+      {
+        code: 'SYNTAX_ERROR' as const,
+        message: `AST transformation error: ${(err as Error)?.message ?? String(err)}`
+      }
+    ];
     return { success: false, kind: 'ast-transform', errors };
   }
 }
@@ -538,10 +545,8 @@ export function parseDerivationExpression(expression: string): ParseDerivationRe
   }
   const validated = ExternalStepParamsSchema.safeParse(parsed.ast);
   if (!validated.success) {
-    const zodIssues = validated.error.issues.map(
-      (i) => `Schema: ${i.message} at ${i.path.join('.')}`
-    );
-    return { success: false, kind: 'ast-validation', errors: zodIssues };
+    const errors = validated.error.issues.map(mapZodIssue);
+    return { success: false, kind: 'ast-validation', errors };
   }
   return { success: true, params: validated.data };
 }
