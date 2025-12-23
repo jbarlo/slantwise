@@ -3,6 +3,7 @@ import { createCliContext, CliContext } from './context.js';
 import { listCommand } from './commands/list.js';
 import { createCommand } from './commands/create.js';
 import { readCommand } from './commands/read.js';
+import { traceCommand } from './commands/trace.js';
 import { updateCommand } from './commands/update.js';
 import { deleteCommand } from './commands/delete.js';
 import { initCommand } from './commands/init.js';
@@ -34,6 +35,7 @@ program.addCommand(initCommand);
 program.addCommand(listCommand);
 program.addCommand(createCommand);
 program.addCommand(readCommand);
+program.addCommand(traceCommand);
 program.addCommand(updateCommand);
 program.addCommand(deleteCommand);
 
