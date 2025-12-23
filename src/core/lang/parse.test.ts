@@ -157,29 +157,42 @@ describe('parseDerivationExpression', () => {
   });
 
   describe('error cases', () => {
-    it('reports lexer errors with kind=lexer', () => {
+    it('reports lexer errors with kind=lexer and position', () => {
       const result = parseDerivationExpression('llm("unterminated)');
       expect(result.success).toBe(false);
       if (result.success) return;
       expect(result.kind).toBe('lexer');
       expect(result.errors.length).toBeGreaterThan(0);
+      const first = result.errors[0]!;
+      expect(first.code).toBe('SYNTAX_ERROR');
+      expect(first.position).toBeDefined();
+      // position should have either line/column or offset
+      const pos = first.position!;
+      const hasLineCol = pos.line !== undefined && pos.column !== undefined;
+      const hasOffset = pos.offset !== undefined;
+      expect(hasLineCol || hasOffset).toBe(true);
     });
 
-    it('reports parser errors with kind=parser', () => {
+    it('reports parser errors with kind=parser and position', () => {
       const result = parseDerivationExpression('llm(,)');
       expect(result.success).toBe(false);
       if (result.success) return;
       expect(result.kind).toBe('parser');
       expect(result.errors.length).toBeGreaterThan(0);
+      const first = result.errors[0]!;
+      expect(first.code).toBe('SYNTAX_ERROR');
+      expect(first.position).toBeDefined();
     });
 
-    it('reports ast-validation errors with kind=ast-validation', () => {
+    it('reports ast-validation errors with kind=ast-validation and error codes', () => {
       // Valid syntax and tokens, but invalid model enum => ast-validation
       const result = parseDerivationExpression('llm("x", prompt="ok", model="nope")');
       expect(result.success).toBe(false);
       if (result.success) return;
       expect(result.kind).toBe('ast-validation');
       expect(result.errors.length).toBeGreaterThan(0);
+      // Validation errors should have INVALID_MODEL code
+      expect(result.errors.some((e) => e.code === 'INVALID_MODEL')).toBe(true);
     });
 
     it('enforces kwargs must follow positional inputs', () => {

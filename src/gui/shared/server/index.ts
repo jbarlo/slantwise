@@ -5,7 +5,7 @@ import {
   updateDerivation as coreUpdateDerivation,
   getOrComputeDerivedContent
 } from '@core/derivationEngine/index.js';
-import { parseDerivationExpression } from '@core/lang/index.js';
+import { parseDerivationExpression, formatParseError } from '@core/lang/index.js';
 import type { ExternalDerivationParams } from '@core/db/types.js';
 import { TRPCError } from '@trpc/server';
 import { updateConfig } from '@core/config.js';
@@ -17,7 +17,10 @@ export const appRouter = router({
     .mutation(async ({ ctx, input }) => {
       const parsed = parseDerivationExpression(input.expression);
       if (!parsed.success) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: parsed.errors.join('\n') });
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: parsed.errors.map(formatParseError).join('\n')
+        });
       }
 
       const derivationParams: ExternalDerivationParams = {
@@ -39,7 +42,10 @@ export const appRouter = router({
     .mutation(async ({ ctx, input }) => {
       const parsed = parseDerivationExpression(input.expression);
       if (!parsed.success) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: parsed.errors.join('\n') });
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: parsed.errors.map(formatParseError).join('\n')
+        });
       }
 
       const derivationParams: ExternalDerivationParams = {

@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import inquirer from 'inquirer';
 import { isEmpty, isNil, trim } from 'lodash-es';
 import { getContext, isInteractive, GlobalOptions } from '../index.js';
-import { parseDerivationExpression } from '@core/lang/index.js';
+import { parseDerivationExpression, formatParseError } from '@core/lang/index.js';
 import { createDerivation } from '@core/derivationEngine/index.js';
 import { getOrComputeDerivedContent } from '@core/derivationEngine/index.js';
 import type { ExternalDerivationParams } from '@core/db/types.js';
@@ -34,7 +34,15 @@ export const createCommand = new Command('create')
       const parsed = parseDerivationExpression(expression);
       if (!parsed.success) {
         console.error('Parse error:');
-        console.error(parsed.errors.join('\n'));
+        for (const err of parsed.errors) {
+          console.error(formatParseError(err));
+        }
+        if (parsed.errors.some((e) => e.code === 'INVALID_MODEL')) {
+          console.error('\nHint: Run "slantwise models" to see available models.');
+        }
+        if (parsed.errors.some((e) => e.code === 'UNKNOWN_OPERATION')) {
+          console.error('\nHint: Run "slantwise operations" to see available operations.');
+        }
         process.exit(2);
       }
 

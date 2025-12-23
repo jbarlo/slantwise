@@ -1,6 +1,6 @@
 import { linter, Diagnostic } from '@codemirror/lint';
 import { Text } from '@codemirror/state';
-import { parseDerivationExpression } from '../../../../../core/lang/index.js';
+import { parseDerivationExpression, type ParseError } from '../../../../../core/lang/index.js';
 import { tokenPatterns, removeDerivationPrefix } from '@lang-data/tokens.js';
 
 type DerivationForLinting = {
@@ -58,38 +58,26 @@ export function createDerivationLinter(derivations: DerivationForLinting[]) {
 }
 
 /**
- * Converts a parser error string to a CodeMirror Diagnostic
+ * Converts a ParseError to a CodeMirror Diagnostic
  */
-function convertErrorToDiagnostic(error: string, doc: Text): Diagnostic {
-  // Parse error message to extract position information
-  // Format examples:
-  // "Lex #1: unexpected character: ->! at line 1, column 5"
-  // "Parse #1: Expecting token of type --> RParen <-- but found --> 'x' <-- at offset: 15"
-
-  const lineColumnMatch = error.match(/line (\d+), column (\d+)/);
-  const offsetMatch = error.match(/offset:?\s*(\d+)/);
-
+function convertErrorToDiagnostic(error: ParseError, doc: Text): Diagnostic {
   let from = 0;
   let to = doc.length;
 
-  if (lineColumnMatch) {
-    const line = parseInt(lineColumnMatch[1]!, 10);
-    const column = parseInt(lineColumnMatch[2]!, 10);
-
-    // Convert 1-based line/column to 0-based position
-    const lineStart = doc.line(line).from;
-    from = lineStart + column - 1;
-    to = Math.min(from + 1, doc.length);
-  } else if (offsetMatch) {
-    const offset = parseInt(offsetMatch[1]!, 10);
-    from = Math.min(offset, doc.length);
-    to = Math.min(from + 1, doc.length);
+  if (error.position) {
+    if (error.position.line !== undefined && error.position.column !== undefined) {
+      // Clamp line to valid range (doc.lines is the total line count)
+      const line = Math.max(1, Math.min(error.position.line, doc.lines));
+      const lineInfo = doc.line(line);
+      // Clamp column to line length
+      const column = Math.max(1, Math.min(error.position.column, lineInfo.length + 1));
+      from = lineInfo.from + column - 1;
+      to = Math.min(from + 1, doc.length);
+    } else if (error.position.offset !== undefined) {
+      from = Math.min(error.position.offset, doc.length);
+      to = Math.min(from + 1, doc.length);
+    }
   }
 
-  // Extract the error message (remove position info for cleaner display)
-  let message = error;
-  message = message.replace(/at line \d+, column \d+/, '').trim();
-  message = message.replace(/at offset:?\s*\d+/, '').trim();
-
-  return { from, to, severity: 'error', message };
+  return { from, to, severity: 'error', message: error.message };
 }
