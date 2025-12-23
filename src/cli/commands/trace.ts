@@ -8,10 +8,12 @@ export const traceCommand = new Command('trace')
   .description('Show execution trace for a formula')
   .argument('[identifier]', 'Formula ID or label')
   .option('--full', 'Show full values without truncation')
+  .option('-r, --reroll', 'Force recalculation and bypass cache')
   .option('-y, --no-interactive', 'Disable interactive prompts')
-  .action(async (identifierArg: string | undefined, opts: { full?: boolean }) => {
+  .action(async (identifierArg: string | undefined) => {
     const ctx = await getContext();
     const globalOpts = traceCommand.optsWithGlobals<GlobalOptions>();
+    const localOpts = traceCommand.opts<{ full?: boolean; reroll?: boolean }>();
     const interactive = isInteractive(globalOpts);
 
     const formulas = ctx.appDal.derivations.getAllDerivations();
@@ -33,7 +35,8 @@ export const traceCommand = new Command('trace')
       ctx.appDal,
       formula.derivation_id,
       ctx.rateLimiter,
-      ctx.config
+      ctx.config,
+      { skipCache: localOpts.reroll }
     );
 
     if (!result.success) {
@@ -44,7 +47,7 @@ export const traceCommand = new Command('trace')
     const trace = formatExecutionTrace(
       result.executionTree,
       (hash) => ctx.appDal.core.findContentByHash(hash),
-      { full: opts.full }
+      { full: localOpts.full }
     );
 
     const label = formula.label
