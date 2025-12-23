@@ -45,7 +45,7 @@ export interface ExecutionPlan {
  * Result of planning pass that discovers dependencies without executing operations
  */
 type PlanningError =
-  | { kind: 'derivation_not_found'; derivationId: string }
+  | { kind: 'formula_not_found'; derivationId: string }
   | { kind: 'planning_internal_error'; message: string };
 
 type PlanningResult =
@@ -76,7 +76,7 @@ async function _discoverDependencies(
     if (!derivation) {
       return {
         success: false,
-        error: { kind: 'derivation_not_found', derivationId }
+        error: { kind: 'formula_not_found', derivationId }
       };
     }
 

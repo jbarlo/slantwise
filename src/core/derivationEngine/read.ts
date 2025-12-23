@@ -502,7 +502,7 @@ export async function getOrComputeDerivedContent(
       const planResult = await createExecutionPlan(appDal, derivationId);
       if (!planResult.success) {
         logger('ERROR', `Failed to create execution plan: ${JSON.stringify(planResult.error)}`);
-        if (planResult.error.kind === 'derivation_not_found') {
+        if (planResult.error.kind === 'formula_not_found') {
           return {
             success: false,
             error: getReadErrorInfo('derivationNotFound', {
