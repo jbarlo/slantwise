@@ -92,7 +92,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: hash(expectedResult)
         }
       });
@@ -119,7 +119,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: content,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: currentHash
         }
       });
@@ -143,7 +143,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: expectedHash
         }
       });
@@ -182,13 +182,13 @@ describe('Derivation Engine', () => {
           operation: 'identity',
           // an identity operation with the same input was cached when the inner
           // identity step ran
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: hash(expectedResult),
           dependencies: [
             {
               type: 'computed_step',
               operation: 'identity',
-              wasCached: false
+              cacheStatus: 'computed'
             }
           ]
         }
@@ -226,13 +226,13 @@ describe('Derivation Engine', () => {
         executionTree: {
           // an identity operation with the same input was cached when the inner
           // identity step ran
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: currentHash,
           dependencies: [
             {
               type: 'computed_step',
               operation: 'identity',
-              wasCached: false
+              cacheStatus: 'computed'
             }
           ]
         }
@@ -267,13 +267,13 @@ describe('Derivation Engine', () => {
         executionTree: {
           // an identity operation with the same input was cached when the inner
           // identity step ran
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: expectedHash,
           dependencies: [
             {
               type: 'computed_step',
               operation: 'identity',
-              wasCached: false,
+              cacheStatus: 'computed',
               dependencies: [
                 {
                   type: 'constant',
@@ -328,13 +328,13 @@ describe('Derivation Engine', () => {
         executionTree: {
           // an identity operation with the same input was cached when the inner
           // identity step ran
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: hash(expectedResult),
           dependencies: [
             {
               type: 'derivation',
               operation: 'identity',
-              wasCached: false
+              cacheStatus: 'computed'
             }
           ]
         }
@@ -382,13 +382,13 @@ describe('Derivation Engine', () => {
         executionTree: {
           // an identity operation with the same input was cached when the inner
           // identity step ran
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: currentHash,
           dependencies: [
             {
               type: 'derivation',
               operation: 'identity',
-              wasCached: false
+              cacheStatus: 'computed'
             }
           ]
         }
@@ -426,13 +426,13 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: expectedHash,
           dependencies: [
             {
               type: 'derivation',
               operation: 'identity',
-              wasCached: false,
+              cacheStatus: 'computed',
               dependencies: [
                 {
                   type: 'constant',
@@ -572,23 +572,23 @@ describe('Derivation Engine', () => {
         output: newExpectedOutput,
         executionTree: {
           operation: 'identity',
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: hash(newExpectedOutput),
           dependencies: [
             {
               type: 'computed_step',
               operation: 'concat',
-              wasCached: false,
+              cacheStatus: 'computed',
               dependencies: [
                 {
                   type: 'computed_step',
                   operation: 'identity',
-                  wasCached: false
+                  cacheStatus: 'computed'
                 },
                 {
                   type: 'computed_step',
                   operation: 'identity',
-                  wasCached: true
+                  cacheStatus: 'cached'
                 }
               ]
             }
@@ -656,13 +656,13 @@ describe('Derivation Engine', () => {
         executionTree: {
           operation: 'identity',
           // the identity operation is cached because the input is constant
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: hash(expectedOutput),
           dependencies: [
             {
               type: 'computed_step',
               operation: 'testConstant',
-              wasCached: false
+              cacheStatus: 'computed'
             }
           ]
         }
@@ -754,7 +754,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: hash(expectedResult),
           dependencies: [{ type: 'content' }]
         }
@@ -767,7 +767,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: hash(expectedResult),
           dependencies: [{ type: 'content' }]
         }
@@ -793,7 +793,7 @@ describe('Derivation Engine', () => {
         getOrComputeDerivedContent(appDal, derivationId, limiter)
       ).resolves.toMatchObject({
         success: true,
-        executionTree: { wasCached: false }
+        executionTree: { cacheStatus: 'computed' }
       });
 
       // cached
@@ -801,7 +801,7 @@ describe('Derivation Engine', () => {
         getOrComputeDerivedContent(appDal, derivationId, limiter)
       ).resolves.toMatchObject({
         success: true,
-        executionTree: { wasCached: true }
+        executionTree: { cacheStatus: 'cached' }
       });
 
       // reroll
@@ -809,7 +809,7 @@ describe('Derivation Engine', () => {
         getOrComputeDerivedContent(appDal, derivationId, limiter, { skipCache: true })
       ).resolves.toMatchObject({
         success: true,
-        executionTree: { wasCached: false }
+        executionTree: { cacheStatus: 'computed' }
       });
     });
 
@@ -834,7 +834,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: content,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: currentHash
         }
       });
@@ -850,7 +850,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: newContent,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: newHash
         }
       });
@@ -884,13 +884,13 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: expectedHash,
           dependencies: [
             {
               type: 'derivation',
               operation: 'identity',
-              wasCached: false
+              cacheStatus: 'computed'
             }
           ]
         }
@@ -902,13 +902,13 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: expectedHash,
           dependencies: [
             {
               type: 'derivation',
               operation: 'identity',
-              wasCached: true
+              cacheStatus: 'cached'
             }
           ]
         }
@@ -933,13 +933,13 @@ describe('Derivation Engine', () => {
         success: true,
         output: newContent,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: newHash,
           dependencies: [
             {
               type: 'derivation',
               operation: 'identity',
-              wasCached: false
+              cacheStatus: 'computed'
             }
           ]
         }
@@ -966,7 +966,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: expectedHash
         }
       });
@@ -977,7 +977,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: expectedHash
         }
       });
@@ -1000,7 +1000,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: newContent,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: newHash
         }
       });
@@ -1026,7 +1026,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: expectedHash
         }
       });
@@ -1037,7 +1037,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: expectedHash
         }
       });
@@ -1056,7 +1056,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedResult,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: expectedHash
         }
       });
@@ -1096,7 +1096,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedOutput,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: expectedHash
         }
       });
@@ -1107,7 +1107,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedOutput,
         executionTree: {
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: expectedHash
         }
       });
@@ -1121,7 +1121,7 @@ describe('Derivation Engine', () => {
       expect(result).toMatchObject({
         success: true,
         output: expectedOutput,
-        executionTree: { wasCached: true, contentHash: expectedHash }
+        executionTree: { cacheStatus: 'cached', contentHash: expectedHash }
       });
 
       assert(result.success === true);
@@ -1220,7 +1220,7 @@ describe('Derivation Engine', () => {
         success: true,
         output: expectedOutput,
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: expectedHash,
           warnings: [{ type: 'inputTooLarge' }]
         }

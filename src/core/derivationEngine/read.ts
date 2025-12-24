@@ -165,7 +165,7 @@ const _computeDependencies = async (
 
       dependencyTree.push({
         type: 'derivation',
-        wasCached: execTree.wasCached,
+        cacheStatus: execTree.cacheStatus,
         dependencies: execTree.dependencies,
         contentHash: execTree.contentHash,
         operation: execTree.operation,
@@ -203,7 +203,7 @@ const _computeDependencies = async (
       const exec = stepResult.executionTree;
       dependencyTree.push({
         type: 'computed_step',
-        wasCached: exec.wasCached,
+        cacheStatus: exec.cacheStatus,
         dependencies: exec.dependencies,
         contentHash: exec.contentHash,
         operation: exec.operation,
@@ -244,7 +244,7 @@ const _tryShortCircuit = async (
 > => {
   const inputDescriptors = recipeParams.inputs;
 
-  // Always compute dependencies to ensure dependencyTree wasCached flags stay
+  // Always compute dependencies to ensure dependencyTree cacheStatus flags stay
   // current
   const computedDependencies = await _computeDependencies(
     appDal,
@@ -466,7 +466,7 @@ export async function getOrComputeDerivedContentByStep(
     output: outputContent,
     executionTree: {
       operation: recipeParams.operation,
-      wasCached: false,
+      cacheStatus: 'computed',
       dependencies: dependencyTree,
       contentHash: resultStored.hash,
       warnings: operationResult.warnings
