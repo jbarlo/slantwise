@@ -21,7 +21,12 @@ export const readCommand = new Command('read')
       process.exit(1);
     }
 
-    const formulaResult = await getFormula(identifierArg, interactive, formulas);
+    const formulaResult = await getFormula(
+      identifierArg,
+      interactive,
+      formulas,
+      'Select formula to read:'
+    );
     if (!formulaResult.success) {
       console.error(formulaResult.error);
       process.exit(formulaResult.code);
