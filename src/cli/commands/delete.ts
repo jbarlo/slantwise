@@ -16,7 +16,12 @@ export const deleteCommand = new Command('delete')
 
     const formulas = ctx.appDal.derivations.getAllDerivations();
 
-    const result = await getFormula(identifierArg, shouldBeInteractive, formulas);
+    const result = await getFormula(
+      identifierArg,
+      shouldBeInteractive,
+      formulas,
+      'Select formula to delete:'
+    );
     if (!result.success) {
       console.error(result.error);
       process.exit(result.code);
