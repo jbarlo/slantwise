@@ -5,7 +5,8 @@ import { UserDerivation } from '@core/db/derivationsService.js';
 export const getFormula = async (
   identifierArg: string | undefined,
   shouldBeInteractive: boolean,
-  formulas: UserDerivation[]
+  formulas: UserDerivation[],
+  prompt: string
 ): Promise<
   { success: true; formula: UserDerivation } | { success: false; code: 1 | 2; error: string }
 > => {
@@ -79,7 +80,7 @@ export const getFormula = async (
     {
       type: 'list',
       name: 'formulaId',
-      message: 'Select formula to delete:',
+      message: prompt,
       choices: formulas.map((d) => ({
         name: d.label
           ? `${d.label} (${d.derivation_id}) - ${d.dsl_expression}`
