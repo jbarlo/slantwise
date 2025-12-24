@@ -43,7 +43,7 @@ export const applyCacheHit = (
       output: cachedOutput,
       executionTree: {
         operation: recipeParams.operation,
-        wasCached: true,
+        cacheStatus: 'cached',
         // make sure to use the resolved dependency tree, not the cached one
         // (or risk returning a cached dependency tree for an unrelated
         // step)

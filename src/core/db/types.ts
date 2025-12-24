@@ -169,6 +169,8 @@ export type OperationWarning = {
   contextWindowLimit: number;
 };
 
+export type CacheStatus = 'computed' | 'cached' | 'seed';
+
 // TODO consider an extended shape mirroring StepParams
 export type DependencyTree = (
   | {
@@ -177,7 +179,7 @@ export type DependencyTree = (
     }
   | {
       type: 'derivation' | 'computed_step';
-      wasCached: boolean;
+      cacheStatus: CacheStatus;
       dependencies: DependencyTree;
       contentHash: string;
       warnings: OperationWarning[];
@@ -187,7 +189,7 @@ export type DependencyTree = (
 
 export type ExecutionTree = {
   operation: StepParams['operation'];
-  wasCached: boolean;
+  cacheStatus: CacheStatus;
   dependencies: DependencyTree;
   warnings: OperationWarning[];
   contentHash: string;

@@ -6,14 +6,14 @@ describe('utils', () => {
   it('should accurately count the total number of steps', () => {
     const execTree: ExecutionTree = {
       contentHash: '123',
-      wasCached: false,
+      cacheStatus: 'computed',
       operation: 'llm',
       warnings: [],
       dependencies: [
         {
           type: 'derivation',
           operation: 'llm',
-          wasCached: true,
+          cacheStatus: 'cached',
           dependencies: [
             {
               type: 'content',
@@ -30,12 +30,12 @@ describe('utils', () => {
         {
           type: 'computed_step',
           operation: 'llm',
-          wasCached: true,
+          cacheStatus: 'cached',
           dependencies: [
             {
               type: 'computed_step',
               operation: 'llm',
-              wasCached: true,
+              cacheStatus: 'cached',
               dependencies: [
                 {
                   type: 'content',
@@ -58,14 +58,14 @@ describe('utils', () => {
   it('should accurately count the cached number of steps', () => {
     const execTree: ExecutionTree = {
       contentHash: '123',
-      wasCached: true,
+      cacheStatus: 'cached',
       operation: 'llm',
       warnings: [],
       dependencies: [
         {
           type: 'derivation',
           operation: 'llm',
-          wasCached: true,
+          cacheStatus: 'cached',
           dependencies: [
             {
               type: 'content',
@@ -82,12 +82,12 @@ describe('utils', () => {
         {
           type: 'computed_step',
           operation: 'llm',
-          wasCached: true,
+          cacheStatus: 'cached',
           dependencies: [
             {
               type: 'computed_step',
               operation: 'llm',
-              wasCached: false,
+              cacheStatus: 'computed',
               dependencies: [
                 {
                   type: 'content',
