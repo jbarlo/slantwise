@@ -56,8 +56,7 @@ async function _seedIterationBuffer(
       content: seed.content,
       executionTree: {
         operation,
-        // seeds act as if cached
-        wasCached: true,
+        cacheStatus: 'seed',
         dependencies: seedDependencies,
         contentHash: seed.hash,
         warnings: seedWarnings

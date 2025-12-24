@@ -564,21 +564,20 @@ describe('SCC Planning and Evaluation', () => {
         output: '',
         executionTree: {
           // A
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: hash(''),
           dependencies: [
             {
               // B
               type: 'derivation',
               operation: 'identity',
-              wasCached: false,
+              cacheStatus: 'computed',
               dependencies: [
                 {
                   // A
                   type: 'derivation',
                   operation: 'identity',
-                  // seed value acts as if cached
-                  wasCached: true,
+                  cacheStatus: 'seed',
                   dependencies: []
                 }
               ]
@@ -593,7 +592,7 @@ describe('SCC Planning and Evaluation', () => {
         output: '',
         executionTree: {
           // B
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: hash(''),
           dependencies: [
             {
@@ -601,14 +600,13 @@ describe('SCC Planning and Evaluation', () => {
               type: 'derivation',
               operation: 'identity',
               // cached from executing A previously
-              wasCached: true,
+              cacheStatus: 'cached',
               dependencies: [
                 {
                   // B
                   type: 'derivation',
                   operation: 'identity',
-                  // seed value acts as if cached
-                  wasCached: true,
+                  cacheStatus: 'seed',
                   dependencies: []
                 }
               ]
@@ -655,7 +653,7 @@ describe('SCC Planning and Evaluation', () => {
         success: true,
         output: 'A\nB\n',
         executionTree: {
-          wasCached: false,
+          cacheStatus: 'computed',
           contentHash: hash('A\nB\n'),
           operation: 'concat',
           dependencies: [
@@ -665,7 +663,7 @@ describe('SCC Planning and Evaluation', () => {
             },
             {
               type: 'derivation',
-              wasCached: false,
+              cacheStatus: 'computed',
               operation: 'concat',
               dependencies: [
                 {
@@ -675,8 +673,7 @@ describe('SCC Planning and Evaluation', () => {
                 {
                   type: 'derivation',
                   operation: 'concat',
-                  // seed value acts as if cached
-                  wasCached: true,
+                  cacheStatus: 'seed',
                   dependencies: []
                 }
               ]
@@ -691,7 +688,7 @@ describe('SCC Planning and Evaluation', () => {
         output: 'B\nA\n',
         executionTree: {
           // B was calculated during A's computation, so expect caching
-          wasCached: true,
+          cacheStatus: 'cached',
           contentHash: hash('B\nA\n'),
           operation: 'concat',
           dependencies: [
@@ -701,7 +698,7 @@ describe('SCC Planning and Evaluation', () => {
             },
             {
               type: 'derivation',
-              wasCached: true,
+              cacheStatus: 'cached',
               operation: 'concat',
               dependencies: [
                 {
@@ -711,8 +708,7 @@ describe('SCC Planning and Evaluation', () => {
                 {
                   type: 'derivation',
                   operation: 'concat',
-                  // seed value acts as if cached
-                  wasCached: true,
+                  cacheStatus: 'seed',
                   dependencies: []
                 }
               ]
@@ -773,63 +769,62 @@ describe('SCC Planning and Evaluation', () => {
         output: 'A\nC\nB\nA\nC\nB\nA\nC\nB\n',
         executionTree: {
           operation: 'concat',
-          wasCached: false,
+          cacheStatus: 'computed',
           dependencies: [
             { type: 'constant', contentHash: hash('A') },
             {
               type: 'derivation',
               operation: 'concat',
-              wasCached: false,
+              cacheStatus: 'computed',
               dependencies: [
                 { type: 'constant', contentHash: hash('C') },
                 {
                   type: 'derivation',
                   operation: 'concat',
-                  wasCached: false,
+                  cacheStatus: 'computed',
                   dependencies: [
                     { type: 'constant', contentHash: hash('B') },
                     {
                       type: 'derivation',
                       operation: 'concat',
-                      wasCached: false,
+                      cacheStatus: 'computed',
                       dependencies: [
                         { type: 'constant', contentHash: hash('A') },
                         {
                           type: 'derivation',
                           operation: 'concat',
-                          wasCached: false,
+                          cacheStatus: 'computed',
                           dependencies: [
                             { type: 'constant', contentHash: hash('C') },
                             {
                               type: 'derivation',
                               operation: 'concat',
-                              wasCached: false,
+                              cacheStatus: 'computed',
                               dependencies: [
                                 { type: 'constant', contentHash: hash('B') },
                                 {
                                   type: 'derivation',
                                   operation: 'concat',
-                                  wasCached: false,
+                                  cacheStatus: 'computed',
                                   dependencies: [
                                     { type: 'constant', contentHash: hash('A') },
                                     {
                                       type: 'derivation',
                                       operation: 'concat',
-                                      wasCached: false,
+                                      cacheStatus: 'computed',
                                       dependencies: [
                                         { type: 'constant', contentHash: hash('C') },
                                         {
                                           type: 'derivation',
                                           operation: 'concat',
-                                          wasCached: false,
+                                          cacheStatus: 'computed',
                                           dependencies: [
                                             { type: 'constant', contentHash: hash('B') },
                                             {
                                               type: 'derivation',
                                               operation: 'concat',
                                               dependencies: [],
-                                              // seed value acts as if cached
-                                              wasCached: true
+                                              cacheStatus: 'seed'
                                             }
                                           ]
                                         }
@@ -861,63 +856,62 @@ describe('SCC Planning and Evaluation', () => {
         output: 'B\nA\nC\nB\nA\nC\nB\nA\nC\n',
         executionTree: {
           operation: 'concat',
-          wasCached: true,
+          cacheStatus: 'cached',
           dependencies: [
             { type: 'constant', contentHash: hash('B') },
             {
               type: 'derivation',
               operation: 'concat',
-              wasCached: true,
+              cacheStatus: 'cached',
               dependencies: [
                 { type: 'constant', contentHash: hash('A') },
                 {
                   type: 'derivation',
                   operation: 'concat',
-                  wasCached: true,
+                  cacheStatus: 'cached',
                   dependencies: [
                     { type: 'constant', contentHash: hash('C') },
                     {
                       type: 'derivation',
                       operation: 'concat',
-                      wasCached: true,
+                      cacheStatus: 'cached',
                       dependencies: [
                         { type: 'constant', contentHash: hash('B') },
                         {
                           type: 'derivation',
                           operation: 'concat',
-                          wasCached: true,
+                          cacheStatus: 'cached',
                           dependencies: [
                             { type: 'constant', contentHash: hash('A') },
                             {
                               type: 'derivation',
                               operation: 'concat',
-                              wasCached: true,
+                              cacheStatus: 'cached',
                               dependencies: [
                                 { type: 'constant', contentHash: hash('C') },
                                 {
                                   type: 'derivation',
                                   operation: 'concat',
-                                  wasCached: true,
+                                  cacheStatus: 'cached',
                                   dependencies: [
                                     { type: 'constant', contentHash: hash('B') },
                                     {
                                       type: 'derivation',
                                       operation: 'concat',
-                                      wasCached: true,
+                                      cacheStatus: 'cached',
                                       dependencies: [
                                         { type: 'constant', contentHash: hash('A') },
                                         {
                                           type: 'derivation',
                                           operation: 'concat',
-                                          wasCached: true,
+                                          cacheStatus: 'cached',
                                           dependencies: [
                                             { type: 'constant', contentHash: hash('C') },
                                             {
                                               type: 'derivation',
                                               operation: 'concat',
                                               dependencies: [],
-                                              // seed value acts as if cached
-                                              wasCached: true
+                                              cacheStatus: 'seed'
                                             }
                                           ]
                                         }
@@ -949,63 +943,62 @@ describe('SCC Planning and Evaluation', () => {
         output: 'C\nB\nA\nC\nB\nA\nC\nB\nA\n',
         executionTree: {
           operation: 'concat',
-          wasCached: true,
+          cacheStatus: 'cached',
           dependencies: [
             { type: 'constant', contentHash: hash('C') },
             {
               type: 'derivation',
               operation: 'concat',
-              wasCached: true,
+              cacheStatus: 'cached',
               dependencies: [
                 { type: 'constant', contentHash: hash('B') },
                 {
                   type: 'derivation',
                   operation: 'concat',
-                  wasCached: true,
+                  cacheStatus: 'cached',
                   dependencies: [
                     { type: 'constant', contentHash: hash('A') },
                     {
                       type: 'derivation',
                       operation: 'concat',
-                      wasCached: true,
+                      cacheStatus: 'cached',
                       dependencies: [
                         { type: 'constant', contentHash: hash('C') },
                         {
                           type: 'derivation',
                           operation: 'concat',
-                          wasCached: true,
+                          cacheStatus: 'cached',
                           dependencies: [
                             { type: 'constant', contentHash: hash('B') },
                             {
                               type: 'derivation',
                               operation: 'concat',
-                              wasCached: true,
+                              cacheStatus: 'cached',
                               dependencies: [
                                 { type: 'constant', contentHash: hash('A') },
                                 {
                                   type: 'derivation',
                                   operation: 'concat',
-                                  wasCached: true,
+                                  cacheStatus: 'cached',
                                   dependencies: [
                                     { type: 'constant', contentHash: hash('C') },
                                     {
                                       type: 'derivation',
                                       operation: 'concat',
-                                      wasCached: true,
+                                      cacheStatus: 'cached',
                                       dependencies: [
                                         { type: 'constant', contentHash: hash('B') },
                                         {
                                           type: 'derivation',
                                           operation: 'concat',
-                                          wasCached: true,
+                                          cacheStatus: 'cached',
                                           dependencies: [
                                             { type: 'constant', contentHash: hash('A') },
                                             {
                                               type: 'derivation',
                                               operation: 'concat',
                                               dependencies: [],
-                                              // seed value acts as if cached
-                                              wasCached: true
+                                              cacheStatus: 'seed'
                                             }
                                           ]
                                         }
@@ -1154,7 +1147,7 @@ describe('SCC Planning and Evaluation', () => {
 
       // Verify execution tree structure
       expect(result.executionTree).toMatchObject({
-        wasCached: false,
+        cacheStatus: 'computed',
         operation: 'concat',
         dependencies: [
           {
@@ -1164,7 +1157,7 @@ describe('SCC Planning and Evaluation', () => {
           {
             type: 'derivation',
             operation: 'concat',
-            wasCached: false,
+            cacheStatus: 'computed',
             dependencies: [
               {
                 type: 'constant',
@@ -1173,7 +1166,7 @@ describe('SCC Planning and Evaluation', () => {
               {
                 type: 'derivation',
                 operation: 'concat',
-                wasCached: false,
+                cacheStatus: 'computed',
                 dependencies: [
                   {
                     type: 'constant',
@@ -1182,8 +1175,7 @@ describe('SCC Planning and Evaluation', () => {
                   {
                     type: 'derivation',
                     operation: 'concat',
-                    // Seed value acts as if cached
-                    wasCached: true,
+                    cacheStatus: 'seed',
                     dependencies: []
                   }
                 ]

@@ -1,4 +1,4 @@
-import { DependencyTree, ExecutionTree } from '@core/db/types.js';
+import { CacheStatus, DependencyTree, ExecutionTree } from '@core/db/types.js';
 
 export type ContentResolver = (hash: string) => string | undefined;
 
@@ -15,8 +15,12 @@ const truncate = (str: string, full: boolean): string => {
   return oneLine.slice(0, TRUNCATE_LENGTH) + '...';
 };
 
-const formatCacheStatus = (wasCached: boolean): string => {
-  return wasCached ? '[cached]' : '[computed]';
+const formatCacheStatus = (status: CacheStatus): string => {
+  if (status === 'computed') return '[computed]';
+  if (status === 'cached') return '[cached]';
+  if (status === 'seed') return '[seed]';
+  const _exhaustive: never = status;
+  return _exhaustive;
 };
 
 type TreeNode = {
@@ -49,8 +53,8 @@ const dependencyToNode = (
     const content = resolveContent(dep.contentHash);
     return {
       label: dep.operation,
-      cacheStatus: formatCacheStatus(dep.wasCached),
-      value: content ? truncate(content, opts.full ?? false) : undefined,
+      cacheStatus: formatCacheStatus(dep.cacheStatus),
+      value: content !== undefined ? truncate(content, opts.full ?? false) : undefined,
       children: dep.dependencies.map((child: DependencyTree[number]) =>
         dependencyToNode(child, resolveContent, opts)
       )
@@ -69,8 +73,8 @@ const executionTreeToNode = (
   const content = resolveContent(tree.contentHash);
   return {
     label: tree.operation,
-    cacheStatus: formatCacheStatus(tree.wasCached),
-    value: content ? truncate(content, opts.full ?? false) : undefined,
+    cacheStatus: formatCacheStatus(tree.cacheStatus),
+    value: content !== undefined ? truncate(content, opts.full ?? false) : undefined,
     children: tree.dependencies.map((dep) => dependencyToNode(dep, resolveContent, opts))
   };
 };

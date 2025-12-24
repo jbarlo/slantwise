@@ -16,12 +16,13 @@ export const getExecutionTreeStatistics = (
 
   const unwrappedSteps = unwrapExecutionTree(executionTree.dependencies);
 
-  // treat elements with a wasCached property as not cacheable (content input)
-  const cacheableSteps = unwrappedSteps.filter((step) => 'wasCached' in step);
+  // treat elements with a cacheStatus property as cacheable (derivation/computed_step)
+  const cacheableSteps = unwrappedSteps.filter((step) => 'cacheStatus' in step);
 
   return {
     cachedSteps:
-      (executionTree.wasCached ? 1 : 0) + cacheableSteps.filter((step) => step.wasCached).length,
+      (executionTree.cacheStatus === 'cached' ? 1 : 0) +
+      cacheableSteps.filter((step) => step.cacheStatus === 'cached').length,
     // +1 for the root step
     totalSteps: 1 + cacheableSteps.length
   };
