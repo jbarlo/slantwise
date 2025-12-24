@@ -38,12 +38,17 @@ export const updateCommand = new Command('update')
       const formula = formulaResult.formula;
       const formulaId = formula.derivation_id;
 
-      const expressionResult = await getExpression(interactive);
-      if (!expressionResult.success) {
-        console.error(expressionResult.error);
-        process.exit(expressionResult.code);
+      let expression: string;
+      if (opts.expression !== undefined) {
+        expression = opts.expression;
+      } else {
+        const expressionResult = await getExpression(interactive, formula.dsl_expression);
+        if (!expressionResult.success) {
+          console.error(expressionResult.error);
+          process.exit(expressionResult.code);
+        }
+        expression = expressionResult.expression;
       }
-      const expression = expressionResult.expression;
 
       const parsed = parseDerivationExpression(expression);
       if (!parsed.success) {
@@ -74,9 +79,12 @@ export const updateCommand = new Command('update')
         label = resp.label;
       }
 
+      // use existing label if no new label provided
+      const finalLabel = label === undefined || isEmpty(trim(label)) ? formula.label : label;
+
       const derivationParams: ExternalDerivationParams = {
         recipeParams: parsed.params,
-        label: isEmpty(trim(label)) ? null : label!
+        label: finalLabel
       };
 
       updateDerivation(ctx.appDal, formulaId, derivationParams, expression);

@@ -100,7 +100,8 @@ export const getFormula = async (
 };
 
 export const getExpression = async (
-  shouldBeInteractive: boolean
+  shouldBeInteractive: boolean,
+  defaultExpression: string | undefined
 ): Promise<
   { success: true; expression: string } | { success: false; code: 1 | 2; error: string }
 > => {
@@ -116,7 +117,8 @@ export const getExpression = async (
     {
       type: 'input',
       name: 'expression',
-      message: 'DSL expression:'
+      message: 'DSL expression:',
+      default: defaultExpression
     }
   ]);
 

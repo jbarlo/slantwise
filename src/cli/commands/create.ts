@@ -22,7 +22,7 @@ export const createCommand = new Command('create')
 
       const result: Awaited<ReturnType<typeof getExpression>> = expressionArg
         ? { success: true, expression: expressionArg }
-        : await getExpression(interactive);
+        : await getExpression(interactive, undefined);
 
       if (!result.success) {
         console.error(result.error);
