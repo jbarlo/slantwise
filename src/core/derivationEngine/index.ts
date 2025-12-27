@@ -4,5 +4,9 @@ export type { SccOptions, SccResult, SccExecutionContext } from './types.js';
 export type { ExecutionPlan, PlanNode, PlanUnit } from './planner.js';
 export type {
   GetOrComputeDerivedContentOpts,
-  GetOrComputeDerivedContentByStepOpts
+  GetOrComputeDerivedContentByStepOpts,
+  EngineEvent,
+  PlanReadyEvent,
+  StepCompleteEvent,
+  OnEngineEvent
 } from './types.js';

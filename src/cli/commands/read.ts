@@ -1,7 +1,66 @@
 import { Command } from 'commander';
 import { getContext, isInteractive, GlobalOptions } from '../index.js';
-import { getOrComputeDerivedContent } from '@core/derivationEngine/index.js';
+import { getOrComputeDerivedContent, EngineEvent } from '@core/derivationEngine/index.js';
 import { getFormula } from './utils.js';
+
+/** Progress state for stderr output */
+type ProgressState = {
+  total: number;
+  completed: number;
+  cached: number;
+  tokens: number;
+};
+
+/** Create a progress handler that writes to stderr when TTY */
+function createProgressHandler() {
+  const isTTY = process.stderr.isTTY || process.env.SLANTWISE_FORCE_PROGRESS;
+  if (!isTTY) {
+    // Non-TTY: silent per plan decisions
+    return { onEvent: () => {}, finalize: () => {} };
+  }
+
+  const state: ProgressState = { total: 0, completed: 0, cached: 0, tokens: 0 };
+  let dirty = false;
+
+  const render = () => {
+    const cachedStr = state.cached > 0 ? ` (${state.cached} cached)` : '';
+    const line = `Formulas: ${state.completed}/${state.total}${cachedStr} | Tokens: ${state.tokens}`;
+    process.stderr.write(`\r\x1b[K${line}`);
+  };
+
+  const scheduleRender = () => {
+    if (!dirty) {
+      dirty = true;
+      setImmediate(() => {
+        render();
+        dirty = false;
+      });
+    }
+  };
+
+  const onEvent = (event: EngineEvent) => {
+    if (event.type === 'PLAN_READY') {
+      state.total = event.plan.planUnits.length;
+      scheduleRender();
+    } else if (event.type === 'STEP_COMPLETE') {
+      state.completed++;
+      if (event.execTree.cacheStatus !== 'computed') {
+        state.cached++;
+      }
+      if (event.tokensOutput) {
+        state.tokens += event.tokensOutput;
+      }
+      scheduleRender();
+    }
+  };
+
+  const finalize = () => {
+    // Clear the progress line before output
+    process.stderr.write('\r\x1b[K');
+  };
+
+  return { onEvent, finalize };
+}
 
 export const readCommand = new Command('read')
   .description('Read/execute a formula and output its result')
@@ -34,13 +93,17 @@ export const readCommand = new Command('read')
 
     const formula = formulaResult.formula;
 
+    const progress = createProgressHandler();
+
     const result = await getOrComputeDerivedContent(
       ctx.appDal,
       formula.derivation_id,
       ctx.rateLimiter,
       ctx.config,
-      { skipCache: localOpts.reroll }
+      { skipCache: localOpts.reroll, onEvent: progress.onEvent }
     );
+
+    progress.finalize();
 
     if (!result.success) {
       console.error(result.error.message);

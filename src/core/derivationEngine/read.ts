@@ -45,6 +45,7 @@ type StepResult =
       success: true;
       output: string;
       executionTree: ExecutionTree;
+      tokensOutput?: number; // only present for LLM ops
     }
   | {
       success: false;
@@ -127,7 +128,9 @@ const _computeDependencies = async (
           const res = await getOrComputeDerivedContent(appDal, id, limiter, config, {
             sccContext: context,
             scc: undefined,
-            skipCache: opts.skipCache
+            skipCache: opts.skipCache,
+            onEvent: opts.onEvent,
+            plan: opts.plan
           });
           if (!res.success) return { success: false, error: res.error.message };
           return { success: true, executionTree: res.executionTree };
@@ -153,7 +156,7 @@ const _computeDependencies = async (
           currentInput.id,
           limiter,
           config,
-          { sccContext, scc: undefined, skipCache: opts.skipCache }
+          { sccContext, scc: undefined, skipCache: opts.skipCache, onEvent: opts.onEvent, plan: opts.plan }
         );
 
         if (!derivationResult.success) {
@@ -470,7 +473,8 @@ export async function getOrComputeDerivedContentByStep(
       dependencies: dependencyTree,
       contentHash: resultStored.hash,
       warnings: operationResult.warnings
-    }
+    },
+    tokensOutput: operationResult.tokensOutput
   };
 }
 
@@ -493,11 +497,14 @@ export async function getOrComputeDerivedContent(
 > {
   logDerivationComputeStart(derivationId);
 
+  const onEvent = opts?.onEvent;
+
   try {
     // Get or create execution plan upfront
     let plan: ExecutionPlan;
-    if (opts?.sccContext?.plan) {
-      plan = opts.sccContext.plan;
+    if (opts?.plan) {
+      // Reuse plan from parent call (avoids redundant planning)
+      plan = opts.plan;
     } else {
       const planResult = await createExecutionPlan(appDal, derivationId);
       if (!planResult.success) {
@@ -521,6 +528,8 @@ export async function getOrComputeDerivedContent(
         };
       }
       plan = planResult.plan;
+      // Emit PLAN_READY only once when we create a new plan
+      onEvent?.({ type: 'PLAN_READY', plan });
     }
 
     // If we're already in SCC iteration context, compute directly
@@ -534,15 +543,26 @@ export async function getOrComputeDerivedContent(
         };
       }
       const { final_step_id: stepId, recipe_params: recipeParams } = derivation;
-      return getOrComputeDerivedContentByStep(
+      const stepResult = await getOrComputeDerivedContentByStep(
         appDal,
         stepId,
         recipeParams,
         limiter,
         config,
         { derivationId },
-        opts
+        { ...opts, plan }
       );
+
+      if (stepResult.success) {
+        onEvent?.({
+          type: 'STEP_COMPLETE',
+          derivationId,
+          execTree: stepResult.executionTree,
+          tokensOutput: stepResult.tokensOutput
+        });
+      }
+
+      return stepResult;
     }
 
     // Check if target derivation is part of an SCC
@@ -553,12 +573,14 @@ export async function getOrComputeDerivedContent(
         const res = await getOrComputeDerivedContent(appDal, id, limiter, config, {
           sccContext: context,
           scc: undefined,
-          skipCache: opts?.skipCache
+          skipCache: opts?.skipCache,
+          onEvent,
+          plan
         });
         if (!res.success) return { success: false, error: res.error.message };
         return { success: true, executionTree: res.executionTree };
       };
-      const sccResult = await evaluateScc(appDal, scc.nodeIds, opts?.scc ?? {}, plan, resolver);
+      const sccResult = await evaluateScc(appDal, scc.nodeIds, opts?.scc ?? {}, resolver);
       if (!sccResult.success) {
         return {
           success: false,
@@ -576,6 +598,13 @@ export async function getOrComputeDerivedContent(
           })
         };
       }
+      // Emit STEP_COMPLETE for SCC member
+      onEvent?.({
+        type: 'STEP_COMPLETE',
+        derivationId,
+        execTree: member.executionTree
+        // tokensOutput not tracked for SCC yet
+      });
       return {
         success: true,
         output: member.content,
@@ -602,15 +631,26 @@ export async function getOrComputeDerivedContent(
       };
     }
 
-    return getOrComputeDerivedContentByStep(
+    const stepResult = await getOrComputeDerivedContentByStep(
       appDal,
       stepId,
       recipeParams,
       limiter,
       config,
       { derivationId },
-      opts
+      { ...opts, plan }
     );
+
+    if (stepResult.success) {
+      onEvent?.({
+        type: 'STEP_COMPLETE',
+        derivationId,
+        execTree: stepResult.executionTree,
+        tokensOutput: stepResult.tokensOutput
+      });
+    }
+
+    return stepResult;
   } catch (error: unknown) {
     logDerivationComputeUnexpectedError(derivationId, error);
     return {

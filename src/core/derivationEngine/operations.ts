@@ -26,6 +26,7 @@ type OperationResult = {
   output?: string;
   error?: string;
   warnings: OperationWarning[];
+  tokensOutput?: number; // only present for LLM ops
 };
 
 type Operations = StepParams['operation'];
@@ -231,7 +232,11 @@ async function _executeLlmOperation(
         },
         config
       );
-      return { output: response.text, warnings };
+      return {
+        output: response.text,
+        warnings,
+        tokensOutput: response.usage.outputTokens
+      };
     },
     options,
     { simulateDelay: true }

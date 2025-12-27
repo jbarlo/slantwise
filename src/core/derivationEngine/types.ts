@@ -1,6 +1,23 @@
 import { ExecutionTree } from '../db/types.js';
 import type { ExecutionPlan } from './planner.js';
 
+// Engine event types (discriminated union)
+export type PlanReadyEvent = {
+  type: 'PLAN_READY';
+  plan: ExecutionPlan;
+};
+
+export type StepCompleteEvent = {
+  type: 'STEP_COMPLETE';
+  derivationId: string;
+  execTree: ExecutionTree;
+  tokensOutput?: number; // only present for LLM ops
+};
+
+export type EngineEvent = PlanReadyEvent | StepCompleteEvent;
+
+export type OnEngineEvent = (event: EngineEvent) => void;
+
 /**
  * SCC execution options
  */
@@ -49,7 +66,6 @@ export interface SccExecutionContext {
   iterationBuffer: Map<string, IterationValue>;
   // Per-node remaining compute budget during SCC recursive unrolling
   remainingBudgetByNode: Map<string, number>;
-  plan: ExecutionPlan;
 }
 
 export interface OperationOptions {
@@ -63,6 +79,10 @@ export interface GetOrComputeDerivedContentByStepOpts {
   sccContext?: SccExecutionContext;
   // Skip cache lookup and force re-evaluation
   skipCache?: boolean;
+  // Event callback for progress updates
+  onEvent?: OnEngineEvent;
+  // Reuse existing plan from parent call (avoids redundant planning)
+  plan?: ExecutionPlan;
 }
 
 // TODO move? rename?

@@ -4,7 +4,6 @@ import { logger } from '../logger.js';
 import { hash, stableStringify } from '../utils.js';
 import { IterationValue, SccExecutionContext, SccOptions, SccResult } from './types.js';
 import { isNil, map } from 'lodash-es';
-import type { ExecutionPlan } from './planner.js';
 
 /**
  * Seeds the iteration buffer with initial values
@@ -185,7 +184,6 @@ export async function evaluateScc(
   appDal: AppDal,
   memberIds: string[],
   options: SccOptions,
-  plan: ExecutionPlan,
   resolve: SccDerivationResolver
 ): Promise<SccResult> {
   // Derive a stable, deterministic member ordering using precomputed keys
@@ -225,8 +223,7 @@ export async function evaluateScc(
     const sccContext: SccExecutionContext = {
       sccId,
       iterationBuffer: currentBuffer,
-      remainingBudgetByNode: budget,
-      plan
+      remainingBudgetByNode: budget
     };
 
     const passResult = await _performJacobiPass(appDal, sortedMemberIds, sccContext, resolve);
