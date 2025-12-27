@@ -30,6 +30,7 @@ function createProgressHandler() {
     thinkingFrame: -1
   };
   let dirty = false;
+  let finalized = false;
 
   const ELLIPSIS = ['.', '.', '..', '..', '...', '...'];
 
@@ -45,10 +46,12 @@ function createProgressHandler() {
   };
 
   const scheduleRender = () => {
-    if (!dirty) {
+    if (!dirty && !finalized) {
       dirty = true;
       setImmediate(() => {
-        render();
+        if (!finalized) {
+          render();
+        }
         dirty = false;
       });
     }
@@ -86,8 +89,10 @@ function createProgressHandler() {
   };
 
   const finalize = () => {
-    // Clear the progress line before output
-    process.stderr.write('\r\x1b[K');
+    finalized = true;
+    // Final render with newline
+    render();
+    process.stderr.write('\n');
   };
 
   return { onEvent, finalize };
