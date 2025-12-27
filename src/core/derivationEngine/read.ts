@@ -409,13 +409,49 @@ export async function getOrComputeDerivedContentByStep(
     computedDependencies: { dependencyTree, pinnedHashesMap }
   } = shortCircuitResult;
 
+  // Create callback to emit streaming token updates during LLM generation
+  const onTokenUpdate = opts?.onEvent
+    ? (estimatedTokens: number) => {
+        opts.onEvent!({
+          type: 'LLM_TOKEN_UPDATE',
+          derivationId: logging.derivationId,
+          tokensOutput: estimatedTokens
+        });
+      }
+    : undefined;
+
+  // Create callback to emit when LLM call ends with actual tokens
+  const onEnd = opts?.onEvent
+    ? (tokensOutput: number) => {
+        opts.onEvent!({
+          type: 'LLM_CALL_END',
+          derivationId: logging.derivationId,
+          tokensOutput
+        });
+      }
+    : undefined;
+
+  // Create callback to emit thinking progress updates
+  const onThinkingUpdate = opts?.onEvent
+    ? (elapsedMs: number) => {
+        opts.onEvent!({
+          type: 'LLM_THINKING_UPDATE',
+          derivationId: logging.derivationId,
+          elapsedMs
+        });
+      }
+    : undefined;
+
   const operationPerformed = await performOperation(
     appDal,
     inputContentHashes,
     recipeParams,
     config,
     logging,
-    opts?.operationOptions
+    opts?.operationOptions,
+    onTokenUpdate,
+    onEnd,
+    onThinkingUpdate
   );
 
   if (!operationPerformed.success) {

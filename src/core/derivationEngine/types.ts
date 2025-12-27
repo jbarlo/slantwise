@@ -14,7 +14,30 @@ export type StepCompleteEvent = {
   tokensOutput?: number; // only present for LLM ops
 };
 
-export type EngineEvent = PlanReadyEvent | StepCompleteEvent;
+export type LlmTokenUpdateEvent = {
+  type: 'LLM_TOKEN_UPDATE';
+  derivationId: string;
+  tokensOutput: number; // cumulative estimated tokens for this LLM call
+};
+
+export type LlmCallEndEvent = {
+  type: 'LLM_CALL_END';
+  derivationId: string;
+  tokensOutput: number; // actual tokens from API
+};
+
+export type LlmThinkingUpdateEvent = {
+  type: 'LLM_THINKING_UPDATE';
+  derivationId: string;
+  elapsedMs: number;
+};
+
+export type EngineEvent =
+  | PlanReadyEvent
+  | StepCompleteEvent
+  | LlmTokenUpdateEvent
+  | LlmCallEndEvent
+  | LlmThinkingUpdateEvent;
 
 export type OnEngineEvent = (event: EngineEvent) => void;
 

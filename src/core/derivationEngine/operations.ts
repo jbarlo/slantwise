@@ -53,7 +53,10 @@ export const performOperation = async (
   recipeParams: StepParams,
   config: ConfigType,
   logging: { derivationId: string },
-  options?: Partial<OperationOptions>
+  options?: Partial<OperationOptions>,
+  onTokenUpdate?: (estimatedTokens: number) => void,
+  onEnd?: (tokensOutput: number) => void,
+  onThinkingUpdate?: (elapsedMs: number) => void
 ): Promise<
   { success: true; result: OperationResult } | { success: false; error: ReadErrorInfo }
 > => {
@@ -95,7 +98,7 @@ export const performOperation = async (
   const operationToAction: OperationParams = {
     llm: (...rest) => {
       logDerivationOperationStart(derivationId, 'LLM');
-      return _executeLlmOperation(config, ...rest);
+      return _executeLlmOperation(config, onTokenUpdate, onEnd, onThinkingUpdate, ...rest);
     },
     identity: (...rest) => {
       logDerivationOperationStart(derivationId, 'Identity');
@@ -187,6 +190,9 @@ const _executeOperation = async <P extends StepParams, InputContent extends stri
 
 async function _executeLlmOperation(
   config: ConfigType,
+  onTokenUpdate: ((estimatedTokens: number) => void) | undefined,
+  onEnd: ((tokensOutput: number) => void) | undefined,
+  onThinkingUpdate: ((elapsedMs: number) => void) | undefined,
   inputContent: [string],
   params: LlmDerivationParams,
   logging: { derivationId: string },
@@ -230,7 +236,10 @@ async function _executeLlmOperation(
           systemPrompt,
           prompt: llmInput
         },
-        config
+        config,
+        onTokenUpdate,
+        onEnd,
+        onThinkingUpdate
       );
       return {
         output: response.text,

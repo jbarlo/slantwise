@@ -8,7 +8,9 @@ type ProgressState = {
   total: number;
   completed: number;
   cached: number;
-  tokens: number;
+  completedTokens: number; // tokens from finished steps
+  streamingTokens: number; // tokens from current LLM call (estimated)
+  thinkingFrame: number; // -1 when not thinking, 0+ cycles ellipsis
 };
 
 /** Create a progress handler that writes to stderr when TTY */
@@ -19,12 +21,26 @@ function createProgressHandler() {
     return { onEvent: () => {}, finalize: () => {} };
   }
 
-  const state: ProgressState = { total: 0, completed: 0, cached: 0, tokens: 0 };
+  const state: ProgressState = {
+    total: 0,
+    completed: 0,
+    cached: 0,
+    completedTokens: 0,
+    streamingTokens: 0,
+    thinkingFrame: -1
+  };
   let dirty = false;
+
+  const ELLIPSIS = ['.', '.', '..', '..', '...', '...'];
 
   const render = () => {
     const cachedStr = state.cached > 0 ? ` (${state.cached} cached)` : '';
-    const line = `Formulas: ${state.completed}/${state.total}${cachedStr} | Tokens: ${state.tokens}`;
+    const totalTokens = state.completedTokens + state.streamingTokens;
+    const streamingIndicator = state.streamingTokens > 0 ? '~' : '';
+    const thinkingIndicator =
+      state.thinkingFrame >= 0 ? ` | Thinking${ELLIPSIS[state.thinkingFrame % ELLIPSIS.length]}` : '';
+
+    const line = `Formulas: ${state.completed}/${state.total}${cachedStr} | Tokens: ${streamingIndicator}${totalTokens}${thinkingIndicator}`;
     process.stderr.write(`\r\x1b[K${line}`);
   };
 
@@ -42,14 +58,29 @@ function createProgressHandler() {
     if (event.type === 'PLAN_READY') {
       state.total = event.plan.planUnits.length;
       scheduleRender();
+    } else if (event.type === 'LLM_THINKING_UPDATE') {
+      // Model is in hidden thinking phase (no streaming tokens)
+      state.thinkingFrame = state.thinkingFrame < 0 ? 0 : state.thinkingFrame + 1;
+      scheduleRender();
+    } else if (event.type === 'LLM_TOKEN_UPDATE') {
+      // Streaming token update - clear thinking state
+      state.thinkingFrame = -1;
+      state.streamingTokens = event.tokensOutput;
+      scheduleRender();
+    } else if (event.type === 'LLM_CALL_END') {
+      // LLM call finished - add actual tokens, clear streaming/thinking
+      state.thinkingFrame = -1;
+      state.completedTokens += event.tokensOutput;
+      state.streamingTokens = 0;
+      scheduleRender();
     } else if (event.type === 'STEP_COMPLETE') {
       state.completed++;
       if (event.execTree.cacheStatus !== 'computed') {
         state.cached++;
       }
-      if (event.tokensOutput) {
-        state.tokens += event.tokensOutput;
-      }
+      // Token counting now handled by LLM_CALL_END
+      state.thinkingFrame = -1;
+      state.streamingTokens = 0;
       scheduleRender();
     }
   };

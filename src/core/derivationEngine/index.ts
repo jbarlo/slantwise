@@ -8,5 +8,8 @@ export type {
   EngineEvent,
   PlanReadyEvent,
   StepCompleteEvent,
+  LlmTokenUpdateEvent,
+  LlmCallEndEvent,
+  LlmThinkingUpdateEvent,
   OnEngineEvent
 } from './types.js';
